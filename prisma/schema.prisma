@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Ministry {
+  ministry_id   Int      @id @default(autoincrement())
+  name          String   @unique
+  description   String?
+  contact_email String?
+  contact_phone String?
+  created_at    DateTime @default(now())
+
+  users     User[]
+  documents Document[]
+}
+
+model User {
+  user_id       Int       @id @default(autoincrement())
+  username      String    @unique
+  email         String
+  password_hash String
+  role          Role
+  status        Boolean   @default(true)
+  created_at    DateTime  @default(now())
+  last_login    DateTime?
+  ministry_id   Int?
+  ministry      Ministry? @relation(fields: [ministry_id], references: [ministry_id])
+
+  submittedDocuments Document[]     @relation("SubmittedBy")
+  reviewedDocuments  Document[]     @relation("ReviewedBy")
+  reviews            Review[]
+  feedbacks          Feedback[]
+  revisions          Revision[]
+  activityLogs       ActivityLog[]
+  notifications      Notification[]
+}
+
+model Document {
+  document_id   Int            @id @default(autoincrement())
+  ministry_id   Int?
+  ministry      Ministry?      @relation(fields: [ministry_id], references: [ministry_id], onDelete: Cascade)
+  title         String
+  type          DocumentType
+  file_path     String
+  submitted_by  Int?
+  submittedBy   User?          @relation("SubmittedBy", fields: [submitted_by], references: [user_id])
+  submitted_at  DateTime       @default(now())
+  status        DocumentStatus @default(Submitted)
+  reviewed_by   Int?
+  reviewedBy    User?          @relation("ReviewedBy", fields: [reviewed_by], references: [user_id])
+  reviewed_at   DateTime?
+  last_feedback String?
+
+  reviews   Review[]
+  feedbacks Feedback[]
+  revisions Revision[]
+  logs      ActivityLog[]
+}
+
+model Review {
+  review_id     Int      @id @default(autoincrement())
+  document_id   Int
+  document      Document @relation(fields: [document_id], references: [document_id], onDelete: Cascade)
+  reviewer_id   Int
+  reviewer      User     @relation(fields: [reviewer_id], references: [user_id])
+  quality_score Int?
+  comments      String?
+  decision      Decision
+  reviewed_at   DateTime @default(now())
+}
+
+model Feedback {
+  feedback_id     Int      @id @default(autoincrement())
+  document_id     Int
+  document        Document @relation(fields: [document_id], references: [document_id], onDelete: Cascade)
+  reviewer_id     Int
+  reviewer        User     @relation(fields: [reviewer_id], references: [user_id])
+  feedback_text   String
+  feedback_date   DateTime @default(now())
+  action_required Boolean  @default(false)
+}
+
+model Revision {
+  revision_id      Int      @id @default(autoincrement())
+  document_id      Int
+  document         Document @relation(fields: [document_id], references: [document_id], onDelete: Cascade)
+  old_version_path String?
+  new_version_path String?
+  revised_by       Int
+  revisedBy        User     @relation(fields: [revised_by], references: [user_id])
+  revised_at       DateTime @default(now())
+  notes            String?
+}
+
+model ActivityLog {
+  log_id      Int       @id @default(autoincrement())
+  user_id     Int?
+  user        User?     @relation(fields: [user_id], references: [user_id])
+  action      String
+  document_id Int?
+  document    Document? @relation(fields: [document_id], references: [document_id])
+  timestamp   DateTime  @default(now())
+  details     String?
+}
+
+model Notification {
+  notification_id Int      @id @default(autoincrement())
+  user_id         Int
+  user            User     @relation(fields: [user_id], references: [user_id])
+  message         String
+  is_read         Boolean  @default(false)
+  created_at      DateTime @default(now())
+}
+
+enum Role {
+  Admin
+  Reviewer
+  MinistryUser
+}
+
+enum DocumentType {
+  Report
+  Script
+}
+
+enum DocumentStatus {
+  Submitted
+  Under_Review
+  Accepted
+  Denied
+  Revised
+}
+
+enum Decision {
+  Accepted
+  Under_Review
+  Denied
+}
