@@ -9,13 +9,11 @@ interface AnnouncementFormProps {
   formData: {
     title: string;
     content: string;
-    image_path: string;
   };
   setFormData: React.Dispatch<
     React.SetStateAction<{
       title: string;
       content: string;
-      image_path: string;
     }>
   >;
 

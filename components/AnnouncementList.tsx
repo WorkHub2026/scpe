@@ -1,15 +1,17 @@
-const AnnouncementList = ({
-  data,
-}: {
-  data: Array<{
-    id: number;
-    title: string;
-    content: string;
-    image_path: string | null;
-    created_at: Date;
-    created_by: number;
-  }>;
-}) => {
+interface Announcement {
+  id: number;
+  title: string;
+  content: string;
+  image_path?: string;
+  created_at: string;
+  created_by: number;
+  creator: {
+    user_id: number;
+    name: string;
+  };
+}
+
+const AnnouncementList = ({ data }: { data: Announcement[] }) => {
   return (
     <div className="flex flex-col gap-6">
       {data?.map((announcement, index) => (
