@@ -27,7 +27,7 @@ const Announcements = () => {
     try {
       setLoading(true);
       const data: any = await getAnnouncements();
-      setAnnouncements(data.announcements || []);
+      setAnnouncements(data.announcements);
     } catch (err) {
       setError("Failed to load announcements");
     } finally {

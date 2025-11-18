@@ -7,12 +7,11 @@ import { getAnnouncements } from "@/lib/services/notificationService";
 const AnnouncementView = () => {
   const [announcements, setAnnouncements] = useState([]);
 
+  const fetchAnnouncements = async () => {
+    const data: any = await getAnnouncements();
+    setAnnouncements(data.announcements);
+  };
   useEffect(() => {
-    const fetchAnnouncements = async () => {
-      const data: any = await getAnnouncements();
-      setAnnouncements(data.announcements);
-    };
-
     fetchAnnouncements();
   }, []);
   return (
