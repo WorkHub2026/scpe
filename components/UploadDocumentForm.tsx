@@ -4,7 +4,11 @@ import { createDocument } from "@/lib/services/documentService";
 import React, { useState, useRef } from "react";
 import FileDropZone from "./FileDropZone";
 
-export default function UploadDocumentForm() {
+export default function UploadDocumentForm({
+  setUploadDoc,
+}: {
+  setUploadDoc: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   type UploadFormData = {
     title: string;
     type: "Report" | "Script";
@@ -51,10 +55,6 @@ export default function UploadDocumentForm() {
       onSubmit={handleSubmit}
       className="bg-white p-6 rounded-xl shadow-md border border-[#004225]/30 space-y-4"
     >
-      <h3 className="text-xl font-semibold text-[#004225] mb-4">
-        Upload Document
-      </h3>
-
       {/* Document Title */}
       <input
         type="text"
@@ -92,12 +92,21 @@ export default function UploadDocumentForm() {
       {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
 
       {/* Submit */}
-      <button
-        type="submit"
-        className="w-full py-3 bg-[#004225] text-white rounded-lg font-semibold hover:bg-[#00361d] transition-all"
-      >
-        Upload
-      </button>
+      <div className="flex items-center justify-between space-x-2">
+        <button
+          type="submit"
+          className="w-full py-3 bg-[#004225] text-white rounded-lg font-semibold hover:bg-[#00361d] transition-all"
+        >
+          Submit
+        </button>
+
+        <button
+          onClick={(prev) => setUploadDoc(!prev)}
+          className="w-full h-12 rounded-lg border border-[#004225] text-[#004225] font-semibold"
+        >
+          Cancel
+        </button>
+      </div>
     </form>
   );
 }

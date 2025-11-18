@@ -6,6 +6,7 @@ import BrandAssetsView from "./views/BrandAssetsView";
 import DocumentsView from "./views/DocumentView";
 import Navbar from "../shared/Navbar";
 import Sidebar from "../shared/Sidebar";
+import AnnouncementView from "./views/AnnouncementView";
 
 export default function MinistryDashboard({
   user,
@@ -14,9 +15,9 @@ export default function MinistryDashboard({
   user: any;
   onLogout: () => void;
 }) {
-  const [currentView, setCurrentView] = useState<"documents" | "brand">(
-    "documents"
-  );
+  const [currentView, setCurrentView] = useState<
+    "documents" | "announcements" | "brand"
+  >("documents");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
@@ -32,6 +33,7 @@ export default function MinistryDashboard({
         />
         <main className="flex-1 px-4 sm:px-6 lg:px-8 py-12 max-w-7xl mx-auto w-full">
           {currentView === "documents" && <DocumentsView />}
+          {currentView === "announcements" && <AnnouncementView />}
           {currentView === "brand" && <BrandAssetsView />}
         </main>
       </div>

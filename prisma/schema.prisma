@@ -37,7 +37,7 @@ model User {
   feedbacks          Feedback[]
   revisions          Revision[]
   activityLogs       ActivityLog[]
-  notifications      Notification[]
+  announcement       Announcement[]
 }
 
 model Document {
@@ -108,13 +108,14 @@ model ActivityLog {
   details     String?
 }
 
-model Notification {
-  notification_id Int      @id @default(autoincrement())
-  user_id         Int
-  user            User     @relation(fields: [user_id], references: [user_id])
-  message         String
-  is_read         Boolean  @default(false)
+model Announcement {
+  announcement_id Int      @id @default(autoincrement())
+  title           String
+  content         String
+  image_path      String?
   created_at      DateTime @default(now())
+  created_by      Int
+  creator         User     @relation(fields: [created_by], references: [user_id])
 }
 
 enum Role {

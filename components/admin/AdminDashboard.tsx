@@ -7,6 +7,7 @@ import MinistryProfilesView from "./views/MinistryProfilesView";
 import DigitalAssetManagementView from "./views/DigitalAssetManagementView";
 import Navbar from "../shared/Navbar";
 import Sidebar from "../shared/Sidebar";
+import Announcements from "../Announcements";
 
 export default function AdminDashboard({
   user,
@@ -16,7 +17,12 @@ export default function AdminDashboard({
   onLogout: () => void;
 }) {
   const [currentView, setCurrentView] = useState<
-    "dashboard" | "users" | "profiles" | "digital-assets"
+    | "dashboard"
+    | "users"
+    | "profiles"
+    | "digital-assets"
+    | "announcements"
+    | "brand"
   >("dashboard");
 
   const [selectedTab, setSelectedTab] = useState<"submissions" | "ministries">(
@@ -44,6 +50,8 @@ export default function AdminDashboard({
           {currentView === "users" && <UserManagementView />}
           {currentView === "profiles" && <MinistryProfilesView />}
           {currentView === "digital-assets" && <DigitalAssetManagementView />}
+          {currentView === "announcements" && <Announcements />}
+          {currentView === "brand" && <DigitalAssetManagementView />}
         </main>
       </div>
     </div>
