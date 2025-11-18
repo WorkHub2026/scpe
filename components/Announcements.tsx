@@ -10,16 +10,8 @@ import {
 } from "@/lib/services/notificationService";
 import { useAuth } from "@/context/AuthContext";
 
-interface Announcement {
-  id: number;
-  title: string;
-  content: string;
-  image?: string | null;
-  created_at: string;
-}
-
 const Announcements = () => {
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [announcements, setAnnouncements] = useState([]);
   const [upload, setUpload] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -112,16 +104,7 @@ const Announcements = () => {
           No announcements available.
         </p>
       ) : (
-        <AnnouncementList
-          data={announcements.map((a) => ({
-            id: a.id,
-            title: a.title,
-            content: a.content,
-            image_path: a.image ?? null,
-            created_at: new Date(a.created_at),
-            created_by: (a as any).created_by ?? 0,
-          }))}
-        />
+        <AnnouncementList data={announcements} />
       )}
     </div>
   );

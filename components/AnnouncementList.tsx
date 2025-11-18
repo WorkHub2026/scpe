@@ -14,9 +14,9 @@ const AnnouncementList = ({
 }) => {
   return (
     <div className="flex flex-col gap-6">
-      {data.map((announcement) => (
+      {data.map((announcement, index) => (
         <div
-          key={announcement.id}
+          key={announcement.id ?? `doc-${index}`}
           className="p-4 border border-gray-200 rounded-lg shadow-sm"
         >
           <div className="flex flex-col gap-2 mb-6">
