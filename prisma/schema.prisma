@@ -38,6 +38,8 @@ model User {
   revisions          Revision[]
   activityLogs       ActivityLog[]
   announcement       Announcement[]
+  crises             Crisis[]
+  policies           Policy[]
 }
 
 model Document {
@@ -118,6 +120,25 @@ model Announcement {
   creator         User     @relation(fields: [created_by], references: [user_id])
 }
 
+model Crisis {
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String
+  created_at DateTime @default(now())
+  created_by Int
+  author     User     @relation(fields: [created_by], references: [user_id])
+  priority   Priority @default(LOW)
+}
+
+model Policy {
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String
+  created_at DateTime @default(now())
+  created_by Int
+  author     User     @relation(fields: [created_by], references: [user_id])
+}
+
 enum Role {
   Admin
   Reviewer
@@ -135,6 +156,12 @@ enum DocumentStatus {
   Accepted
   Denied
   Revised
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
 }
 
 enum Decision {

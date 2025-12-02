@@ -74,37 +74,58 @@ export default function SubmissionList({ documents }: { documents: any[] }) {
             key={doc.id ?? `doc-${index}`}
             className="bg-white/70 p-6 rounded-xl border border-emerald-200/50 hover:shadow-lg transition-all duration-300"
           >
-            <div className="flex justify-between items-start">
-              <div className="flex gap-3 items-start">
-                <div>{getStatusIcon(doc.status)}</div>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-start">
+              <div className="flex gap-4 sm:col-span-3">
+                <div className="mt-1 p-2 bg-[#004225]/10 rounded-lg group-hover:bg-[#004225]/20 transition-colors duration-300 flex-shrink-0">
+                  {getStatusIcon(doc.status)}
+                </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">{doc.title}</h3>
-                  <p className="text-sm text-gray-600">{doc.ministry}</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(doc.reviewed_at).toLocaleString()}
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors duration-300 break-words">
+                      {doc.title}
+                    </h3>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#004225]/20 text-[#004225] uppercase font-bold border border-[#004225]/50 flex-shrink-0">
+                      {doc.type}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {doc.ministry?.map((min: any) => (
+                      <span key={min.id}>{min.name}</span>
+                    ))}
                   </p>
+                  <div className="flex gap-4 flex-wrap text-xs text-gray-500">
+                    <span>📅 {new Date(doc.reviewed_at).toLocaleString()}</span>
+                    {/* <span>👤 {doc.reviewer} </span> */}
+                    <span>Ministry of Health</span>
+                  </div>
+
                   {doc.feedbacks && doc.feedbacks.length > 0 && (
-                    <div className="flex items- justify-center space-x-1.5 text-sm mt-2 bg-[#004225]/10 p-2 rounded border border-[#004225]/30 space-y-1">
-                      <strong>Feedback:</strong>
+                    <>
                       {doc.feedbacks.map((f: any, i: any) => (
-                        <p key={i}>{f.feedback_text}</p>
+                        <p className="text-sm text-gray-600 p-2 bg-[#004225]/10 rounded border border-[#004225]/30 mt-3">
+                          <strong className="text-[#004225]">Feedback:</strong>{" "}
+                          {f.feedback_text}
+                        </p>
                       ))}
-                    </div>
+                    </>
                   )}
                 </div>
               </div>
-              <div className="flex flex-col gap-2">
+
+              <div className="flex flex-col gap-2 sm:col-span-1 sm:items-end">
                 <span
-                  className={`px-4 py-2 rounded-lg text-sm font-bold ${getStatusBadge(
+                  className={`px-4 py-2 rounded-lg text-sm font-bold text-center sm:text-right ${getStatusBadge(
                     doc.status
                   )}`}
                 >
-                  {doc.status}
+                  {doc.status === "Submitted"
+                    ? "Under Review"
+                    : doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
                 </span>
                 {doc.status === "Submitted" && (
                   <button
                     onClick={() => setShowModal(doc.document_id)}
-                    className="text-xs px-3 py-2 bg-[#004225]/20 hover:bg-[#004225]/30 text-[#004225] rounded-lg font-bold transition-colors"
+                    className="text-xs px-3 py-2 bg-[#004225]/20 hover:bg-[#004225]/30 text-[#004225] rounded-lg font-bold transition-colors duration-300 whitespace-nowrap"
                   >
                     Make Decision
                   </button>

@@ -8,7 +8,7 @@ const UserList = ({
   users: Array<{
     user_id: number;
     username: string;
-    ministry: string;
+    ministry: string | { name: string };
     email: string;
     role: string;
     status: boolean;
@@ -16,7 +16,7 @@ const UserList = ({
   onEdit: (user: {
     user_id: number;
     username: string;
-    ministry: string;
+    ministry: string | { name: string };
     email: string;
     role: string;
     status: boolean;

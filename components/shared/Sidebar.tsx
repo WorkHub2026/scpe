@@ -13,6 +13,8 @@ import {
   ArrowRight,
   Inbox,
   Mail,
+  AlertTriangle,
+  FileCode,
 } from "lucide-react";
 
 type Role = "Admin" | "MinistryUser";
@@ -39,6 +41,12 @@ export default function Sidebar<T extends string>({
     { id: "dashboard", label: "Dashboard", icon: Home, roles: ["Admin"] },
     { id: "users", label: "User Management", icon: Users, roles: ["Admin"] },
     {
+      id: "documents",
+      label: "Documents",
+      icon: FileText,
+      roles: ["MinistryUser"],
+    },
+    {
       id: "profiles",
       label: "Ministry Profile",
       icon: Package,
@@ -48,69 +56,61 @@ export default function Sidebar<T extends string>({
       id: "announcements",
       label: "Announcements",
       icon: Mail,
-      roles: ["Admin"],
+      roles: ["Admin", "MinistryUser"],
+    },
+    {
+      id: "crisis",
+      label: "Crisis Response",
+      icon: AlertTriangle,
+      roles: ["Admin", "MinistryUser"],
+    },
+    {
+      id: "policy",
+      label: "Policy",
+      icon: FileCode,
+      roles: ["Admin", "MinistryUser"],
     },
     {
       id: "digital-assets",
       label: "Somaliland Brand",
       icon: Zap,
-      roles: ["Admin"],
+      roles: ["Admin", "MinistryUser"],
     },
     // ✅ Ministry routes
-    {
-      id: "documents",
-      label: "Documents",
-      icon: FileText,
-      roles: ["MinistryUser"],
-    },
-    {
-      id: "announcements",
-      label: "Inbox",
-      icon: Mail,
-      roles: ["MinistryUser"],
-    },
-    {
-      id: "brand",
-      label: "Somaliland Brand",
-      icon: Package,
-      roles: ["MinistryUser"],
-    },
   ];
 
   const links = allLinks.filter((link) => link.roles.includes(role));
 
   return (
-    <aside
-      className={`${
-        sidebarOpen ? "w-72" : "w-0"
-      } bg-white border-r border-[#004225]/30 min-h-screen transition-all duration-300 overflow-hidden ${className}`}
-    >
-      <div className="p-8 space-y-6">
-        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
-          {role === "Admin" ? "Admin Navigation" : "Ministry Navigation"}
-        </p>
-
-        <div className="space-y-2">
+    <aside className="w-24 bg-gradient-to-b from-white/80 to-white/60 backdrop-blur-md border-r border-[#004225]/20 min-h-screen sticky top-16 flex flex-col items-center py-6 relative z-40">
+      <div className="space-y-4 flex flex-col items-center w-full">
+        <div className="w-1 h-12 bg-gradient-to-b from-[#004225]/30 to-transparent rounded-full" />
+        {/* Navigation Icons */}
+        <div className="space-y-3 w-full flex flex-col items-center">
           {links.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => {
-                setCurrentView(id as T);
-                if (onToggle) onToggle();
-              }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
-                currentView === id
-                  ? "bg-[#004225]/10 text-[#004225] border border-[#004225]/30 shadow-md"
-                  : "text-gray-600 hover:bg-gray-50"
-              }`}
-              aria-current={currentView === id ? "page" : undefined}
-            >
-              <div className="flex items-center space-x-2">
-                <Icon className="w-5 h-5" />
-                <span className="text-left">{label}</span>
+            <div key={id} className="relative group">
+              <button
+                onClick={() => setCurrentView(id as any)}
+                className={`relative w-12 h-12 rounded-xl transition-all duration-300 flex items-center justify-center font-semibold ${
+                  currentView === id
+                    ? "bg-gradient-to-br from-[#004225] to-[#003218] text-white shadow-lg shadow-[#004225]/40 scale-110"
+                    : "bg-white/40 text-[#004225] hover:bg-white/70 hover:scale-105"
+                }`}
+                title={label}
+              >
+                <Icon className="w-6 h-6" />
+                {/* Active Indicator Dot */}
+                {currentView === id && (
+                  <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#10b981] rounded-full shadow-lg shadow-[#10b981]/50" />
+                )}
+              </button>
+              <div className="absolute left-24 top-1/2 -translate-y-1/2 hidden group-hover:flex z-50 pointer-events-none">
+                <div className="bg-[#004225] text-white text-sm font-bold px-4 py-2 rounded-lg whitespace-nowrap shadow-xl ml-2">
+                  {label}
+                  <div className="absolute right-full mr-1 top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#004225]" />
+                </div>
               </div>
-              {currentView === id && <ArrowRight className="w-4 h-4 ml-auto" />}
-            </button>
+            </div>
           ))}
         </div>
       </div>

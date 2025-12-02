@@ -8,6 +8,8 @@ import DigitalAssetManagementView from "./views/DigitalAssetManagementView";
 import Navbar from "../shared/Navbar";
 import Sidebar from "../shared/Sidebar";
 import Announcements from "../Announcements";
+import CrisisResponseView from "../CrisisComponent";
+import PolicyView from "../PolicyView";
 
 export default function AdminDashboard({
   user,
@@ -22,6 +24,8 @@ export default function AdminDashboard({
     | "profiles"
     | "digital-assets"
     | "announcements"
+    | "crisis"
+    | "policy"
     | "brand"
   >("dashboard");
 
@@ -52,6 +56,8 @@ export default function AdminDashboard({
           {currentView === "digital-assets" && <DigitalAssetManagementView />}
           {currentView === "announcements" && <Announcements />}
           {currentView === "brand" && <DigitalAssetManagementView />}
+          {currentView === "crisis" && <CrisisResponseView />}
+          {currentView === "policy" && <PolicyView />}
         </main>
       </div>
     </div>

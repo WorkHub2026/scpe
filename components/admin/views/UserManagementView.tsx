@@ -1,7 +1,7 @@
 "use client";
 
 import UserList from "@/components/UserList";
-import { listUsers } from "@/lib/services/userService";
+import { createUser, listUsers } from "@/lib/services/userService";
 import { Edit2, Plus, Trash2, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -35,30 +35,32 @@ export default function UserManagementView() {
     name: "",
     ministry: "",
     email: "",
+    password: "",
     role: "",
   });
 
-  // const handleAddUser = () => {
-  //   if (formData.name && formData.ministry && formData.email && formData.role) {
-  //     if (editingId) {
-  //       setUsers(
-  //         users.map((u) => (u.id === editingId ? { ...u, ...formData } : u))
-  //       );
-  //       setEditingId(null);
-  //     } else {
-  //       setUsers([
-  //         ...users,
-  //         {
-  //           id: Math.max(...users.map((u) => u.id), 0) + 1,
-  //           ...formData,
-  //           status: "active",
-  //         },
-  //       ]);
-  //     }
-  //     setFormData({ name: "", ministry: "", email: "", role: "" });
-  //     setIsAddingUser(false);
-  //   }
-  // };
+  const handleAddUser = async () => {
+    if (formData.name && formData.ministry && formData.email && formData.role) {
+      if (editingId) {
+      } else {
+        const newUser: any = {
+          username: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role,
+        };
+        await createUser(newUser);
+      }
+      setFormData({
+        name: "",
+        ministry: "",
+        email: "",
+        role: "",
+        password: "",
+      });
+      setIsAddingUser(false);
+    }
+  };
 
   const handleDeleteUser = (id: number) => {
     setUsers(users.filter((u) => u.user_id !== id));
@@ -70,6 +72,7 @@ export default function UserManagementView() {
       ministry: user.ministry,
       email: user.email,
       role: user.role,
+      password: user.password,
     });
     setEditingId(user.id);
     setIsAddingUser(true);
@@ -90,7 +93,13 @@ export default function UserManagementView() {
       <button
         onClick={() => {
           setIsAddingUser(true);
-          setFormData({ name: "", ministry: "", email: "", role: "" });
+          setFormData({
+            name: "",
+            ministry: "",
+            email: "",
+            role: "",
+            password: "",
+          });
           setEditingId(null);
         }}
         className="flex items-center gap-2 px-6 py-3 bg-[#004225] hover:bg-[#003218] text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-[#004225]/30"
@@ -108,7 +117,13 @@ export default function UserManagementView() {
             <button
               onClick={() => {
                 setIsAddingUser(false);
-                setFormData({ name: "", ministry: "", email: "", role: "" });
+                setFormData({
+                  name: "",
+                  ministry: "",
+                  email: "",
+                  role: "",
+                  password: "",
+                });
                 setEditingId(null);
               }}
               className="p-2 hover:bg-red-50/80 rounded-lg transition-colors duration-300"
@@ -158,6 +173,7 @@ export default function UserManagementView() {
               className="px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white/50 backdrop-blur-sm transition-all duration-300"
             >
               <option value="">Select Role</option>
+              <option value="Admin">Admin</option>
               <option value="Ministry Lead">Ministry Lead</option>
               <option value="Communications Officer">
                 Communications Officer
@@ -175,7 +191,13 @@ export default function UserManagementView() {
             <button
               onClick={() => {
                 setIsAddingUser(false);
-                setFormData({ name: "", ministry: "", email: "", role: "" });
+                setFormData({
+                  name: "",
+                  ministry: "",
+                  email: "",
+                  role: "",
+                  password: "",
+                });
                 setEditingId(null);
               }}
               className="flex-1 px-6 py-3 border border-[#004225]/30 text-gray-700 rounded-lg font-bold hover:bg-gray-50/80 transition-all duration-300"
