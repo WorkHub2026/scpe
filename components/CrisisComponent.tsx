@@ -4,37 +4,51 @@ import { createCrisis } from "@/lib/services/crisis.service";
 import { AlertTriangle, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import CrisisList from "./CrisisList";
+import FileDropZone from "./FileDropZone";
 
 const CrisisResponseView = () => {
   const { user } = useAuth();
 
   const [showCrisisModal, setShowCrisisModal] = useState(false);
-  const [crisisFormData, setCrisisFormData] = useState({
+  const [crisisFormData, setCrisisFormData] = useState<{
+    title: string;
+    file: File | null;
+    priority: "LOW" | "MEDIUM" | "HIGH";
+  }>({
     title: "",
-    content: "",
+    file: null,
     priority: "LOW",
   });
 
   const role = user?.role;
 
   const handlePostCrisis = async () => {
-    if (crisisFormData.title.trim() && crisisFormData.content.trim()) {
-      const data = {
-        title: crisisFormData.title,
-        content: crisisFormData.content,
-        priority: crisisFormData.priority.toUpperCase(), // 👈 FIX HERE
-        created_by: user?.user_id,
-      };
-
-      await createCrisis(data);
-
-      setCrisisFormData({
-        title: "",
-        content: "",
-        priority: "medium",
-      });
-      setShowCrisisModal(false);
+    if (!crisisFormData.title.trim() || !crisisFormData.file) {
+      console.error("Missing title or file");
+      return;
     }
+
+    if (!user?.user_id) {
+      console.error("User ID is missing");
+      return;
+    }
+
+    const data = {
+      title: crisisFormData.title,
+      file: crisisFormData.file,
+      priority: crisisFormData.priority,
+      created_by: user.user_id,
+    };
+
+    await createCrisis(data);
+
+    setCrisisFormData({
+      title: "",
+      file: null,
+      priority: "LOW",
+    });
+
+    setShowCrisisModal(false);
   };
 
   return (
@@ -94,22 +108,12 @@ const CrisisResponseView = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Content
-                </label>
-                <textarea
-                  placeholder="Crisis response content"
-                  value={crisisFormData.content}
-                  onChange={(e) =>
-                    setCrisisFormData({
-                      ...crisisFormData,
-                      content: e.target.value,
-                    })
-                  }
-                  className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white resize-none h-24"
-                />
-              </div>
+              <FileDropZone
+                accept=".pdf,.doc,.docx,.txt"
+                onFileSelect={(file) =>
+                  setCrisisFormData({ ...crisisFormData, file })
+                }
+              />
 
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -120,7 +124,7 @@ const CrisisResponseView = () => {
                   onChange={(e) =>
                     setCrisisFormData({
                       ...crisisFormData,
-                      priority: e.target.value,
+                      priority: e.target.value as "LOW" | "MEDIUM" | "HIGH",
                     })
                   }
                   className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white"

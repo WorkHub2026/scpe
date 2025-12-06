@@ -1,4 +1,7 @@
 "use server";
+import fs from "fs";
+import path from "path";
+import mammoth from "mammoth";
 
 import { prisma } from "../prisma";
 
@@ -19,10 +22,32 @@ export const getAllPolicy = async () => {
   }
 };
 
-export const createPolicy = async (data: any) => {
+export const createPolicy = async (data: {
+  title: string;
+  file: File;
+  created_by: number;
+}) => {
   try {
+    if (!data.file) throw new Error("No file uploaded");
+
+    // Ensure upload directory exists
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "policy");
+    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+    const fileName = `${Date.now()}-${data.file.name}`;
+    const filePath = path.join(uploadDir, fileName);
+
+    // Save file
+    const buffer = Buffer.from(await data.file.arrayBuffer());
+    fs.writeFileSync(filePath, buffer);
+
+    // Save record
     const resp = await prisma.policy.create({
-      data: data,
+      data: {
+        title: data.title,
+        file_path: `/uploads/policy/${fileName}`, // ✅ FIXED
+        created_by: data.created_by,
+      },
     });
 
     return {

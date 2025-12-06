@@ -1,11 +1,12 @@
 "use client";
+import { useAuth } from "@/context/AuthContext";
 import { deletePolicy, getAllPolicy } from "@/lib/services/policy.service";
 import { Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 const PolicyList = () => {
   const [policies, setPolicies] = useState([]);
-
+  const { user } = useAuth();
   const fetchPolicy = async () => {
     try {
       const data: any = await getAllPolicy();
@@ -49,12 +50,14 @@ const PolicyList = () => {
                   {new Date(item.created_at).toLocaleString()}
                 </p>
               </div>
-              <button
-                onClick={() => handleCrisis(item.id)}
-                className="p-2 hover:bg-red-100 text-red-600 rounded-lg transition-colors duration-300"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
+              {user?.role === "Admin" && (
+                <button
+                  onClick={() => handleCrisis(item.id)}
+                  className="p-2 hover:bg-red-100 text-red-600 rounded-lg transition-colors duration-300"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              )}
             </div>
             <p className="text-gray-700">{item.content}</p>
           </div>

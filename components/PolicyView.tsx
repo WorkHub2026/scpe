@@ -4,25 +4,35 @@ import React, { useState } from "react";
 import PolicyList from "./PolicyList";
 import { createPolicy } from "@/lib/services/policy.service";
 import { useAuth } from "@/context/AuthContext";
+import FileDropZone from "./FileDropZone";
 
 const PolicyView = () => {
   const [showPolicyModal, setShowPolicyModal] = useState(false);
-  const [policyFormData, setPolicyFormData] = useState({
+  const [policyFormData, setPolicyFormData] = useState<{
+    title: string;
+    file: File | null;
+  }>({
     title: "",
-    content: "",
+    file: null,
   });
   const { user } = useAuth();
+
   const handlePostPolicy = async () => {
-    if (policyFormData.title.trim() && policyFormData.content.trim()) {
-      const newPolicy = {
-        title: policyFormData.title,
-        content: policyFormData.content,
-        created_by: user?.user_id,
-      };
-      await createPolicy(newPolicy);
-      setPolicyFormData({ title: "", content: "" });
-      setShowPolicyModal(false);
+    if (!policyFormData.file) {
+      console.log("No file selected");
+      return;
     }
+
+    const newPolicy = {
+      title: policyFormData.title,
+      file: policyFormData.file, // ✅ FIXED
+      created_by: user?.user_id!,
+    };
+
+    await createPolicy(newPolicy);
+
+    setPolicyFormData({ title: "", file: null });
+    setShowPolicyModal(false);
   };
 
   return (
@@ -83,22 +93,12 @@ const PolicyView = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Content
-                </label>
-                <textarea
-                  placeholder="Policy content"
-                  value={policyFormData.content}
-                  onChange={(e) =>
-                    setPolicyFormData({
-                      ...policyFormData,
-                      content: e.target.value,
-                    })
-                  }
-                  className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white resize-none h-24"
-                />
-              </div>
+              <FileDropZone
+                accept=".pdf,.doc,.docx,.txt"
+                onFileSelect={(file) =>
+                  setPolicyFormData({ ...policyFormData, file })
+                }
+              />
             </div>
 
             <div className="flex gap-4">

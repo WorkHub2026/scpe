@@ -123,7 +123,7 @@ model Announcement {
 model Crisis {
   id         Int      @id @default(autoincrement())
   title      String
-  content    String
+  file_path  String
   created_at DateTime @default(now())
   created_by Int
   author     User     @relation(fields: [created_by], references: [user_id])
@@ -133,7 +133,7 @@ model Crisis {
 model Policy {
   id         Int      @id @default(autoincrement())
   title      String
-  content    String
+  file_path  String
   created_at DateTime @default(now())
   created_by Int
   author     User     @relation(fields: [created_by], references: [user_id])
@@ -141,7 +141,6 @@ model Policy {
 
 enum Role {
   Admin
-  Reviewer
   MinistryUser
 }
 

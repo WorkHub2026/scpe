@@ -2,10 +2,11 @@
 import { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { deleteCrisis, getAllCrisis } from "@/lib/services/crisis.service";
+import { useRouter } from "next/navigation";
 
 const CrisisList = ({ role }: { role: string | undefined }) => {
   const [crisisResponses, setCrisisResponses] = useState([]);
-
+  const router = useRouter();
   const fetchCrisis = async () => {
     try {
       const data: any = await getAllCrisis();
@@ -44,6 +45,7 @@ const CrisisList = ({ role }: { role: string | undefined }) => {
       {crisisResponses.length > 0 ? (
         crisisResponses?.map((item: any) => (
           <div
+            // onClick={() => router.push(`/crisis/${item.id}`)}
             key={item.id}
             className="bg-white/70 backdrop-blur-sm p-6 rounded-xl border border-emerald-200/50 hover:shadow-lg transition-all duration-300"
           >
