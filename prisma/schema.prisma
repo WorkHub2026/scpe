@@ -139,6 +139,20 @@ model Policy {
   author     User     @relation(fields: [created_by], references: [user_id])
 }
 
+model Notification {
+  id        Int      @id @default(autoincrement())
+  title     String
+  message   String
+  createdAt DateTime @default(now())
+  read      Boolean  @default(false)
+
+  // who received the notification
+  receiver_id Int
+
+  // who triggered it (optional)
+  sender_id Int?
+}
+
 enum Role {
   Admin
   MinistryUser

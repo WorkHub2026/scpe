@@ -1,39 +1,32 @@
 "use client";
 
+import { createMinistry, listMinistries } from "@/lib/services/ministryService";
 import { Edit2, FileText, Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function MinistryProfilesView() {
-  const [ministries, setMinistries] = useState([
-    {
-      id: 1,
-      name: "Ministry of Health",
-      description: "Health sector communications",
-      website: "health.gov",
-      twitter: "@health",
-      facebook: "health.gov",
-      instagram: "@health",
-    },
-    {
-      id: 2,
-      name: "Ministry of Education",
-      description: "Education sector communications",
-      website: "education.gov",
-      twitter: "@education",
-      facebook: "education.gov",
-      instagram: "@education",
-    },
-  ]);
+  const [ministries, setMinistries] = useState<any>([]);
+
+  useEffect(() => {
+    const fetchMinistries = async () => {
+      try {
+        const resp: any = await listMinistries();
+        setMinistries(resp);
+      } catch (error) {
+        console.log("Error at getting ministries", error);
+      }
+    };
+
+    fetchMinistries();
+  }, []);
   const [selectedMinistry, setSelectedMinistry] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    website: "",
-    twitter: "",
-    facebook: "",
-    instagram: "",
+    contact_email: "",
+    contact_phone: "",
   });
 
   const handleEditMinistry = (ministry: any) => {
@@ -47,36 +40,34 @@ export default function MinistryProfilesView() {
     setFormData({
       name: "",
       description: "",
-      website: "",
-      twitter: "",
-      facebook: "",
-      instagram: "",
+      contact_email: "",
+      contact_phone: "",
     });
     setSelectedMinistry({
-      id: Math.max(...ministries.map((m) => m.id), 0) + 1,
+      id: Math.max(...ministries.map((m: any) => m.id), 0) + 1,
     });
     setIsAddingNew(true);
     setIsEditing(true);
   };
 
-  const handleSaveNewMinistry = () => {
-    if (formData.name.trim()) {
-      if (isAddingNew) {
-        setMinistries([
-          ...ministries,
-          { id: selectedMinistry.id, ...formData },
-        ]);
-      } else {
-        setMinistries(
-          ministries.map((m) =>
-            m.id === selectedMinistry.id ? { ...m, ...formData } : m
-          )
-        );
-      }
+  const handleSaveNewMinistry = async () => {
+    try {
+      setFormData({
+        name: "",
+        description: "",
+        contact_email: "",
+        contact_phone: "",
+      });
+      const newMinistry = {
+        name: formData.name,
+        contact_email: formData.contact_email,
+        description: formData.description,
+        contact_phone: formData.contact_phone,
+      };
+      await createMinistry(newMinistry);
+    } catch (error) {
+      console.log("Error at creating a ministry");
     }
-    setIsEditing(false);
-    setIsAddingNew(false);
-    setSelectedMinistry(null);
   };
 
   return (
@@ -102,17 +93,17 @@ export default function MinistryProfilesView() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="space-y-3">
-          {ministries.map((ministry) => (
+          {ministries.map((ministry: any) => (
             <div
-              key={ministry.id}
+              key={ministry.ministry_id}
               onClick={() => {
                 setSelectedMinistry(ministry);
                 setIsEditing(false);
                 setIsAddingNew(false);
               }}
               className={`p-5 rounded-xl border cursor-pointer transition-all duration-300 ${
-                selectedMinistry?.id === ministry.id
-                  ? "bg-gradient-to-br from-[#004225]/20 to-[#004225]/10 border-[#004225]/60 shadow-lg"
+                selectedMinistry?.ministry_id === ministry.ministry_id
+                  ? "bg-linear-to-br from-[#004225]/20 to-[#004225]/10 border-[#004225]/60 shadow-lg"
                   : "bg-white/70 border-[#004225]/30 hover:border-[#004225]/60"
               }`}
             >
@@ -162,33 +153,28 @@ export default function MinistryProfilesView() {
                   />
 
                   <div className="space-y-4 pt-5 border-t border-[#004225]/30">
-                    <p className="font-bold text-gray-900">
-                      Social Media Links
-                    </p>
+                    <p className="font-bold text-gray-900">Contacts</p>
                     <input
-                      type="text"
-                      placeholder="Twitter Handle"
-                      value={formData.twitter}
+                      type="email"
+                      placeholder="Email Contact"
+                      value={formData.contact_email}
                       onChange={(e) =>
-                        setFormData({ ...formData, twitter: e.target.value })
+                        setFormData({
+                          ...formData,
+                          contact_email: e.target.value,
+                        })
                       }
                       className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white/50"
                     />
                     <input
                       type="text"
-                      placeholder="Facebook Page"
-                      value={formData.facebook}
+                      placeholder="Phone Contact"
+                      value={formData.contact_phone}
                       onChange={(e) =>
-                        setFormData({ ...formData, facebook: e.target.value })
-                      }
-                      className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white/50"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Instagram Handle"
-                      value={formData.instagram}
-                      onChange={(e) =>
-                        setFormData({ ...formData, instagram: e.target.value })
+                        setFormData({
+                          ...formData,
+                          contact_phone: e.target.value,
+                        })
                       }
                       className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white/50"
                     />
@@ -225,25 +211,21 @@ export default function MinistryProfilesView() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-600 uppercase">
-                      Website
+                      Email
                     </p>
-                    <a
-                      href={selectedMinistry.website}
-                      className="text-[#004225] hover:text-[#003218] font-semibold mt-2 inline-flex items-center gap-2 transition-colors duration-300"
-                    >
-                      {selectedMinistry.website}
-                    </a>
+                    <span className="text-[#004225] hover:text-[#003218] font-semibold mt-2 inline-flex items-center gap-2 transition-colors duration-300">
+                      {selectedMinistry.contact_email}
+                    </span>
                   </div>
                   <div className="pt-6 border-t border-[#004225]/30">
                     <p className="text-xs font-bold text-gray-600 uppercase mb-4">
-                      Social Media
+                      Contact Phone
                     </p>
                     <div className="space-y-3">
-                      {selectedMinistry.twitter && (
-                        <p className="text-sm text-gray-700 p-3 bg-[#004225]/10 rounded-lg border border-[#004225]/30">
-                          <strong>Twitter:</strong> {selectedMinistry.twitter}
-                        </p>
-                      )}
+                      <p className="text-sm text-gray-700 p-3 bg-[#004225]/10 rounded-lg border border-[#004225]/30">
+                        <strong>Contact:</strong>{" "}
+                        {selectedMinistry.contact_phone}
+                      </p>
                     </div>
                   </div>
                 </div>

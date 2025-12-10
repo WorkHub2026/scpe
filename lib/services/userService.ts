@@ -16,7 +16,7 @@ export async function createUser(data: {
   username: string;
   email: string;
   password: string;
-  role: "Admin" | "Reviewer" | "MinistryUser";
+  role: "Admin" | "MinistryUser";
   ministry_id?: number | null;
 }) {
   const password_hash = await hashPassword(data.password);
@@ -46,10 +46,10 @@ export async function listUsers() {
 export async function updateUser(
   user_id: number,
   data: Partial<{
-    full_name: string;
+    username: string;
     email: string;
     password?: string;
-    role?: "Admin" | "Reviewer" | "MinistryUser";
+    role?: "Admin" | "MinistryUser";
     status?: boolean;
     ministry_id?: number | null;
   }>

@@ -9,41 +9,60 @@ export async function createDocument(data: {
   title: string;
   type: "Report" | "Script";
   file: File;
-  status?: "Submitted" | "Under_Review" | "Accepted" | "Denied" | "Revised";
   submitted_by?: number | null;
   ministry_id?: number | null;
-  reviewed_by?: number | null;
 }) {
   try {
     if (!data.file) throw new Error("No file uploaded");
 
-    // Ensure upload directory exists
     const uploadDir = path.join(process.cwd(), "public", "uploads");
     if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-    // Save file to disk
-    const fileName = `${Date.now()}-${data.file.name}`; // prepend timestamp to avoid collisions
+    const fileName = `${Date.now()}-${data.file.name}`;
     const filePath = path.join(uploadDir, fileName);
+
     const buffer = Buffer.from(await data.file.arrayBuffer());
     fs.writeFileSync(filePath, buffer);
 
-    // Store document record in database
+    // Ensure ministry_id is a number
+    const ministryId = data.ministry_id ? Number(data.ministry_id) : null;
+
+    // Create document
     const newDoc = await prisma.document.create({
       data: {
         title: data.title,
         type: data.type,
-        file_path: `/uploads/${fileName}`, // store relative path for frontend
+        file_path: `/uploads/${fileName}`,
         status: "Submitted",
         submitted_by: data.submitted_by ?? null,
-        ministry_id: data.ministry_id ?? null,
-        reviewed_by: data.reviewed_by ?? null,
+        ministry_id: ministryId, // FIXED HERE
       },
-      include: { ministry: true, submittedBy: true },
+      include: {
+        ministry: true,
+        submittedBy: true,
+      },
     });
+
+    // Create Notification
+    const notification = await prisma.notification.create({
+      data: {
+        title: "New Document Uploaded",
+        message: `Document "${newDoc.title}" has been uploaded by ${
+          newDoc.ministry?.name ?? "Unknown Ministry"
+        }.`,
+        receiver_id: 1, // admin
+        sender_id: newDoc.submitted_by ?? null,
+      },
+    });
+
+    // --------------------------------------------------
+    // 2️⃣ EMIT SOCKET.IO NOTIFICATION
+    // --------------------------------------------------
 
     return {
       success: true,
       document: newDoc,
+      notification,
     };
   } catch (err: any) {
     console.error("❌ Document creation failed:", err);

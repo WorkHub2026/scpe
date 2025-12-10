@@ -1,21 +1,38 @@
 "use client";
 
 import UserList from "@/components/UserList";
-import { createUser, listUsers } from "@/lib/services/userService";
+import { listMinistries } from "@/lib/services/ministryService";
+import {
+  createUser,
+  deleteUser,
+  listUsers,
+  updateUser,
+} from "@/lib/services/userService";
 import { Edit2, Plus, Trash2, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
+
+// Types for form (optional but recommended)
+interface UserForm {
+  name: string;
+  ministry_id: string; // store as string in form
+  email: string;
+  password: string;
+  role: string;
+}
 
 export default function UserManagementView() {
   const [users, setUsers] = useState<
     Array<{
       user_id: number;
       username: string;
-      ministry: string;
+      ministry_id: string;
       email: string;
       role: string;
       status: boolean;
     }>
   >([]);
+
+  const [ministry, setMinistry] = useState<any>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -27,55 +44,71 @@ export default function UserManagementView() {
       }
     };
 
+    const fetchMinistry = async () => {
+      try {
+        const resp: any = await listMinistries();
+        setMinistry(resp);
+      } catch (error) {
+        console.error("Error fetching ministry:", error);
+      }
+    };
+    fetchMinistry();
     fetchUsers();
   }, []);
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<UserForm>({
     name: "",
-    ministry: "",
+    ministry_id: "",
     email: "",
     password: "",
     role: "",
   });
 
   const handleAddUser = async () => {
-    if (formData.name && formData.ministry && formData.email && formData.role) {
-      if (editingId) {
-      } else {
-        const newUser: any = {
-          username: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-        };
-        await createUser(newUser);
-      }
+    try {
+      // Convert ministry_id to a number before sending
+      const newUser = {
+        username: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role as "Admin" | "MinistryUser",
+        ministry_id: formData.ministry_id ? Number(formData.ministry_id) : null, // convert safely
+      };
+
+      await createUser(newUser);
+
+      // Reset form
       setFormData({
         name: "",
-        ministry: "",
+        ministry_id: "",
         email: "",
         role: "",
         password: "",
       });
+
       setIsAddingUser(false);
+    } catch (error) {
+      console.log("Error at creating user:", error);
     }
   };
 
-  const handleDeleteUser = (id: number) => {
-    setUsers(users.filter((u) => u.user_id !== id));
+  const handleDeleteUser = async (id: number) => {
+    await deleteUser(id);
   };
 
-  const handleEditUser = (user: any) => {
-    setFormData({
-      name: user.name,
-      ministry: user.ministry,
-      email: user.email,
-      role: user.role,
-      password: user.password,
-    });
-    setEditingId(user.id);
-    setIsAddingUser(true);
+  const handleEditUser = async (user: any) => {
+    try {
+      await updateUser(user.id, {
+        username: formData.name,
+        email: formData.email,
+        password: formData.password,
+        ministry_id: Number(formData.ministry_id),
+        role: formData.role as "Admin" | "MinistryUser" | undefined,
+      });
+    } catch (error) {
+      console.log("Error at updating a user:", error);
+    }
   };
 
   return (
@@ -89,17 +122,9 @@ export default function UserManagementView() {
           Manage minister users and their platform access
         </p>
       </div>
-
       <button
         onClick={() => {
           setIsAddingUser(true);
-          setFormData({
-            name: "",
-            ministry: "",
-            email: "",
-            role: "",
-            password: "",
-          });
           setEditingId(null);
         }}
         className="flex items-center gap-2 px-6 py-3 bg-[#004225] hover:bg-[#003218] text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-[#004225]/30"
@@ -107,7 +132,6 @@ export default function UserManagementView() {
         <Plus className="w-5 h-5" />
         Add New User
       </button>
-
       {isAddingUser && (
         <div className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-[#004225]/30 shadow-lg">
           <div className="flex justify-between items-center mb-6">
@@ -119,7 +143,7 @@ export default function UserManagementView() {
                 setIsAddingUser(false);
                 setFormData({
                   name: "",
-                  ministry: "",
+                  ministry_id: "",
                   email: "",
                   role: "",
                   password: "",
@@ -135,7 +159,7 @@ export default function UserManagementView() {
           <div className="grid grid-cols-2 gap-5 mb-6">
             <input
               type="text"
-              placeholder="Full Name"
+              placeholder="Username"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -143,28 +167,43 @@ export default function UserManagementView() {
               className="px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white/50 backdrop-blur-sm transition-all duration-300"
             />
             <input
-              type="tel"
-              placeholder="Phone Number"
+              type="email"
+              placeholder="Email"
               value={formData.email}
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
               className="px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white/50 backdrop-blur-sm transition-all duration-300"
             />
-            <select
-              value={formData.ministry}
+            <input
+              type="password"
+              placeholder="Password"
+              value={formData.password}
               onChange={(e) =>
-                setFormData({ ...formData, ministry: e.target.value })
+                setFormData({ ...formData, password: e.target.value })
               }
               className="px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white/50 backdrop-blur-sm transition-all duration-300"
+            />
+            <select
+              value={formData.ministry_id}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  ministry_id: e.target.value,
+                })
+              }
+              className="px-4 py-3 border border-[#004225]/30 rounded-lg 
+    focus:outline-none focus:ring-2 focus:ring-[#004225]/50 
+    bg-white/50 backdrop-blur-sm transition-all duration-300"
             >
               <option value="">Select Ministry</option>
-              <option value="Ministry of Health">Ministry of Health</option>
-              <option value="Ministry of Education">
-                Ministry of Education
-              </option>
-              <option value="Ministry of Finance">Ministry of Finance</option>
+              {ministry?.map((min: any) => (
+                <option value={min.id} key={min.id}>
+                  {min.name}
+                </option>
+              ))}
             </select>
+
             <select
               value={formData.role}
               onChange={(e) =>
@@ -174,16 +213,13 @@ export default function UserManagementView() {
             >
               <option value="">Select Role</option>
               <option value="Admin">Admin</option>
-              <option value="Ministry Lead">Ministry Lead</option>
-              <option value="Communications Officer">
-                Communications Officer
-              </option>
+              <option value="MinistryUser">Ministry User</option>
             </select>
           </div>
 
           <div className="flex gap-4">
             <button
-              // onClick={handleAddUser}
+              onClick={handleAddUser}
               className="flex-1 px-6 py-3 bg-[#004225] hover:bg-[#003218] text-white rounded-lg font-bold transition-all duration-300"
             >
               {editingId ? "Update User" : "Add User"}
@@ -191,13 +227,6 @@ export default function UserManagementView() {
             <button
               onClick={() => {
                 setIsAddingUser(false);
-                setFormData({
-                  name: "",
-                  ministry: "",
-                  email: "",
-                  role: "",
-                  password: "",
-                });
                 setEditingId(null);
               }}
               className="flex-1 px-6 py-3 border border-[#004225]/30 text-gray-700 rounded-lg font-bold hover:bg-gray-50/80 transition-all duration-300"
