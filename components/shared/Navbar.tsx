@@ -1,6 +1,5 @@
 import { LogOut } from "lucide-react";
 import Image from "next/image";
-import NotificationBell from "../NotificationBell";
 
 export default function Navbar({
   user,
@@ -49,9 +48,6 @@ export default function Navbar({
                 )}
               </div>
             </div>
-
-            {/* Notification Bell */}
-            {user.role === "Admin" && <NotificationBell />}
 
             {/* Logout */}
             <button

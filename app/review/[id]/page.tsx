@@ -7,6 +7,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import Navbar from "@/components/shared/Navbar";
 import { useAuth } from "@/context/AuthContext";
+import Chat from "@/components/chat/Chat";
 const ReviewPage = () => {
   const { id } = useParams();
   const [data, setData] = useState<any>(null);
@@ -159,6 +160,8 @@ const ReviewPage = () => {
             ))}
           </div>
         )}
+
+        <Chat documentId={Number(id)} />
       </div>
     </>
   );

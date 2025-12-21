@@ -7,6 +7,7 @@ import { Lock, Mail, LogIn, MessageSquare } from "lucide-react";
 import { loginUser } from "@/lib/services/userService";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { ForgotPasswordModal } from "./ForgotPasswordModal";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -14,7 +15,7 @@ export default function LoginPage() {
   const [supportModal, setSupportModal] = useState(false);
   const [supportEmail, setSupportEmail] = useState("");
   const [supportMessage, setSupportMessage] = useState("");
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const openSupportModal = () => setSupportModal(true);
   const closeSupportModal = () => {
     setSupportModal(false);
@@ -139,6 +140,7 @@ export default function LoginPage() {
           {/* Forgot Password */}
           <div className="text-center">
             <button
+              onClick={() => setIsModalOpen(true)}
               type="button"
               className="text-emerald-700 text-sm font-medium hover:underline"
             >
@@ -160,9 +162,9 @@ export default function LoginPage() {
 
           {/* Info Box */}
           <div className="pt-4 border-t border-emerald-200/50">
-            <p className="text-xs text-gray-600 text-center leading-relaxed">
-              Provide your credentials to access the Government Communication
-              System.
+            <p className="text-sm text-gray-600 text-center leading-relaxed">
+              Contact technical team for any issues regarding login or access.
+              Phone:0634222245 | Email:drkhaalids@gmail.com
             </p>
           </div>
         </form>
@@ -223,6 +225,12 @@ export default function LoginPage() {
           </div>
         </div>
       )}
+
+      {/* The Modal */}
+      <ForgotPasswordModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

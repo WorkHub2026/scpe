@@ -1,7 +1,9 @@
 "use client";
 
 import { CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 export default function ListDocuments({ documents }: { documents: any[] }) {
+  const router = useRouter();
   const getStatusBadge = (status: string) => {
     const styles = {
       Accepted:
@@ -35,6 +37,7 @@ export default function ListDocuments({ documents }: { documents: any[] }) {
       {documents.length > 0 ? (
         documents.map((doc, index) => (
           <div
+            onClick={() => router.push(`/review/${doc.document_id}`)}
             key={doc.id ?? `doc-${index}`}
             className="bg-white/70 backdrop-blur-sm p-4 sm:p-6 rounded-xl border border-emerald-200/50 hover:border-emerald-300/80 hover:shadow-lg transition-all duration-300 group"
           >

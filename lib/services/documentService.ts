@@ -43,16 +43,8 @@ export async function createDocument(data: {
       },
     });
 
-    // Create Notification
-    const notification = await prisma.notification.create({
-      data: {
-        title: "New Document Uploaded",
-        message: `Document "${newDoc.title}" has been uploaded by ${
-          newDoc.ministry?.name ?? "Unknown Ministry"
-        }.`,
-        receiver_id: 1, // admin
-        sender_id: newDoc.submitted_by ?? null,
-      },
+    await prisma.chatThread.create({
+      data: { document_id: newDoc.document_id },
     });
 
     // --------------------------------------------------
@@ -62,7 +54,6 @@ export async function createDocument(data: {
     return {
       success: true,
       document: newDoc,
-      notification,
     };
   } catch (err: any) {
     console.error("❌ Document creation failed:", err);

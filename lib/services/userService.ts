@@ -91,3 +91,32 @@ export async function loginUser(username: string, password: string) {
   const { password_hash, ...safeUser } = user as any;
   return { user: safeUser, token };
 }
+
+export async function resetPasswordByUsername(
+  username: string,
+  newPass: string
+) {
+  try {
+    // 1. Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // 2. Hash the new password
+    const hashedPassword = await hashPassword(newPass);
+
+    // 3. Update the database
+    await prisma.user.update({
+      where: { username },
+      data: { password_hash: hashedPassword },
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
