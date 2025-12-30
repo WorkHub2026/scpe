@@ -198,7 +198,7 @@ export default function UserManagementView() {
             >
               <option value="">Select Ministry</option>
               {ministry?.map((min: any) => (
-                <option value={min.id} key={min.id}>
+                <option value={min.ministry_id} key={min.ministry_id}>
                   {min.name}
                 </option>
               ))}

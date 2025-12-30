@@ -102,7 +102,10 @@ export default function SubmissionList({ documents }: { documents: any[] }) {
                   {doc.feedbacks && doc.feedbacks.length > 0 && (
                     <>
                       {doc.feedbacks.map((f: any, i: any) => (
-                        <p className="text-sm text-gray-600 p-2 bg-[#004225]/10 rounded border border-[#004225]/30 mt-3">
+                        <p
+                          key={i}
+                          className="text-sm text-gray-600 p-2 bg-[#004225]/10 rounded border border-[#004225]/30 mt-3"
+                        >
                           <strong className="text-[#004225]">Feedback:</strong>{" "}
                           {f.feedback_text}
                         </p>

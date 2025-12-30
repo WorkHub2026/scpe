@@ -61,7 +61,9 @@ export default function ListDocuments({ documents }: { documents: any[] }) {
                     ))}
                   </p>
                   <div className="flex gap-4 flex-wrap text-xs text-gray-500">
-                    <span>📅 {new Date(doc.reviewed_at).toLocaleString()}</span>
+                    <span>
+                      📅 {new Date(doc.submitted_at).toLocaleString()}
+                    </span>
                     {/* <span>👤 {doc.reviewer} </span> */}
                   </div>
 

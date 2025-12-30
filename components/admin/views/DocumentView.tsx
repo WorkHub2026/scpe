@@ -6,26 +6,38 @@ import UploadDocumentForm from "@/components/UploadDocumentForm";
 import ListDocuments from "@/components/DocumentList";
 import { listDocuments } from "@/lib/services/documentService";
 import DocumentStat from "@/components/DocumentStat";
+import { useAuth } from "@/context/AuthContext";
+import { AppUser } from "@/lib/auth";
 // adjust import path if needed
 
 export default function DocumentsView() {
   const [documents, setDocuments] = useState<any[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
+
   const [uploadDoc, setUploadDoc] = useState(false);
+
+  const { user } = useAuth();
 
   // Fetch documents on mount
   useEffect(() => {
-    const fetchDocuments = async () => {
+    const fetchDocuments = async (
+      ministry?: { ministry_id?: number } | null
+    ) => {
       try {
-        const res = await listDocuments(); // Backend fetch
+        const res = await listDocuments({
+          ministry_id: ministry?.ministry_id,
+        }); // Backend fetch
         setDocuments(res);
       } catch (err) {
         console.error("Failed to fetch documents:", err);
       }
     };
-    fetchDocuments();
-  }, []);
 
+    if (user?.role === "MinistryUser") {
+      fetchDocuments(user?.ministry ?? null);
+    } else {
+      fetchDocuments();
+    }
+  }, [user]);
   return (
     <div>
       <div className="mb-12">

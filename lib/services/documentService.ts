@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import fs from "fs";
 import path from "path";
 import mammoth from "mammoth";
-
+import { AppUser, isAdmin, isMinistryUser } from "../auth";
 export async function createDocument(data: {
   title: string;
   type: "Report" | "Script";
@@ -254,5 +254,3 @@ export async function createActivityLog(data: {
     },
   });
 }
-
-// get document statistics

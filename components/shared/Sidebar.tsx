@@ -15,6 +15,7 @@ import {
   Mail,
   AlertTriangle,
   FileCode,
+  Key,
 } from "lucide-react";
 
 type Role = "Admin" | "MinistryUser";
@@ -50,6 +51,12 @@ export default function Sidebar<T extends string>({
       id: "profiles",
       label: "Ministry Profile",
       icon: Package,
+      roles: ["Admin"],
+    },
+    {
+      id: "requests",
+      label: "Password Requests",
+      icon: Key,
       roles: ["Admin"],
     },
     {

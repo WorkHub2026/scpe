@@ -32,3 +32,20 @@ export function userToTokenPayload(user: Partial<User>) {
     ministry_id: (user as any).ministry_id ?? null,
   };
 }
+
+export type UserRole = "Admin" | "MinistryUser";
+
+export interface AppUser {
+  id: number;
+  email: string;
+  role: UserRole;
+  ministry_id?: number | null;
+}
+
+export function isAdmin(user: AppUser) {
+  return user.role === "Admin";
+}
+
+export function isMinistryUser(user: AppUser) {
+  return user.role === "MinistryUser";
+}

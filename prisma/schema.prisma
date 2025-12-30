@@ -31,16 +31,18 @@ model User {
   ministry_id   Int?
   ministry      Ministry? @relation(fields: [ministry_id], references: [ministry_id])
 
-  sentMessages       ChatMessage[]
-  submittedDocuments Document[]     @relation("SubmittedBy")
-  reviewedDocuments  Document[]     @relation("ReviewedBy")
-  reviews            Review[]
-  feedbacks          Feedback[]
-  revisions          Revision[]
-  activityLogs       ActivityLog[]
-  announcement       Announcement[]
-  crises             Crisis[]
-  policies           Policy[]
+  sentMessages          ChatMessage[]
+  submittedDocuments    Document[]             @relation("SubmittedBy")
+  reviewedDocuments     Document[]             @relation("ReviewedBy")
+  reviews               Review[]
+  feedbacks             Feedback[]
+  revisions             Revision[]
+  activityLogs          ActivityLog[]
+  announcement          Announcement[]
+  crises                Crisis[]
+  policies              Policy[]
+  passwordResetRequests PasswordResetRequest[] @relation("AdminReviewer")
+  userResetRequests     PasswordResetRequest[] @relation("UserRequester")
 }
 
 model Document {
@@ -162,6 +164,40 @@ model Policy {
   created_at DateTime @default(now())
   created_by Int
   author     User     @relation(fields: [created_by], references: [user_id])
+}
+
+model PasswordResetRequest {
+  id     Int  @id @default(autoincrement())
+  user   User @relation("UserRequester", fields: [userId], references: [user_id])
+  userId Int
+
+  status    ResetStatus @default(PENDING)
+  reason    String?
+  adminNote String?
+
+  createdAt  DateTime  @default(now())
+  reviewedAt DateTime?
+
+  // who processed it
+  reviewedBy Int?
+  admin      User? @relation("AdminReviewer", fields: [reviewedBy], references: [user_id])
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  title       String
+  message     String
+  is_read     Boolean  @default(false)
+  receiver_id Int
+  sender_id   Int
+  created_at  DateTime @default(now())
+}
+
+enum ResetStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
 }
 
 enum Role {

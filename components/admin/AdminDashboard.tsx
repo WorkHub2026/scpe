@@ -10,6 +10,7 @@ import Sidebar from "../shared/Sidebar";
 import Announcements from "../Announcements";
 import CrisisResponseView from "../CrisisComponent";
 import PolicyView from "../PolicyView";
+import PasswordRequest from "../PasswordRequest/PasswordRequest";
 
 export default function AdminDashboard({
   user,
@@ -27,6 +28,7 @@ export default function AdminDashboard({
     | "crisis"
     | "policy"
     | "brand"
+    | "requests"
   >("dashboard");
 
   const [selectedTab, setSelectedTab] = useState<"submissions" | "ministries">(
@@ -58,6 +60,7 @@ export default function AdminDashboard({
           {currentView === "brand" && <DigitalAssetManagementView />}
           {currentView === "crisis" && <CrisisResponseView />}
           {currentView === "policy" && <PolicyView />}
+          {currentView === "requests" && <PasswordRequest />}
         </main>
       </div>
     </div>

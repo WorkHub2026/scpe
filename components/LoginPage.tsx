@@ -7,7 +7,6 @@ import { Lock, Mail, LogIn, MessageSquare } from "lucide-react";
 import { loginUser } from "@/lib/services/userService";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { ForgotPasswordModal } from "./ForgotPasswordModal";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -15,7 +14,6 @@ export default function LoginPage() {
   const [supportModal, setSupportModal] = useState(false);
   const [supportEmail, setSupportEmail] = useState("");
   const [supportMessage, setSupportMessage] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const openSupportModal = () => setSupportModal(true);
   const closeSupportModal = () => {
     setSupportModal(false);
@@ -134,13 +132,12 @@ export default function LoginPage() {
             shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 flex items-center justify-center gap-2"
           >
             <LogIn className="w-5 h-5" />
-            Sign In
+            {isLoading ? "Logging in..." : "Sign In"}
           </button>
 
           {/* Forgot Password */}
           <div className="text-center">
             <button
-              onClick={() => setIsModalOpen(true)}
               type="button"
               className="text-emerald-700 text-sm font-medium hover:underline"
             >
@@ -225,12 +222,6 @@ export default function LoginPage() {
           </div>
         </div>
       )}
-
-      {/* The Modal */}
-      <ForgotPasswordModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
     </div>
   );
 }
