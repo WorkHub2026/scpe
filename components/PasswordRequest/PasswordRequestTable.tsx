@@ -18,23 +18,13 @@ export default function RequestsTable({ requests }: { requests: any[] }) {
   const userId = Number(user?.user_id);
   const handleApprove = async (id: number) => {
     setLoadingId(id);
-    await reviewResetRequest(
-      id,
-      "APPROVED",
-      userId,
-      "Admin has approved the request"
-    );
+    await reviewResetRequest(id, "APPROVED", userId);
     setLoadingId(null);
   };
 
   const handleReject = async (id: number) => {
     setLoadingId(id);
-    await reviewResetRequest(
-      id,
-      "REJECTED",
-      userId,
-      "Admin has rejected the request"
-    );
+    await reviewResetRequest(id, "REJECTED", userId);
     setLoadingId(null);
   };
 
@@ -57,7 +47,6 @@ export default function RequestsTable({ requests }: { requests: any[] }) {
           <thead className="bg-gray-50">
             <tr>
               <th className="p-3 text-left">User</th>
-              <th className="p-3 text-left">Email</th>
               <th className="p-3 text-left">Message</th>
               <th className="p-3 text-left">Status</th>
               <th className="p-3 text-left">Requested</th>
@@ -68,8 +57,7 @@ export default function RequestsTable({ requests }: { requests: any[] }) {
           <tbody>
             {requests.map((r: any) => (
               <tr key={r.id} className="border-t hover:bg-gray-50">
-                <td className="p-3 font-medium">{r.user.username}</td>
-                <td className="p-3 text-gray-600">{r.user.email}</td>
+                <td className="p-3 font-medium">{r.ministry}</td>
                 <td className="p-3">{r.reason}</td>
 
                 {/* Status */}
@@ -130,13 +118,7 @@ export default function RequestsTable({ requests }: { requests: any[] }) {
 
                   {/* Approved: Change Key */}
                   {r.status === "APPROVED" && (
-                    <button
-                      onClick={() => setResetId(r.user.user_id)}
-                      className="px-3 py-2 bg-emerald-600 text-white rounded-lg flex items-center gap-2"
-                    >
-                      <KeyRound className="w-4 h-4" />
-                      Change Key
-                    </button>
+                    <p className="text-gray-400">{r.status}</p>
                   )}
 
                   {/* Rejected */}

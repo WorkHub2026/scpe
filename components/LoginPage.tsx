@@ -7,11 +7,13 @@ import { Lock, Mail, LogIn, MessageSquare } from "lucide-react";
 import { loginUser } from "@/lib/services/userService";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import PasswordRequestModal from "./PasswordRequest/PasswordRequestModal";
 
 export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
   const [supportModal, setSupportModal] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [supportEmail, setSupportEmail] = useState("");
   const [supportMessage, setSupportMessage] = useState("");
   const openSupportModal = () => setSupportModal(true);
@@ -138,6 +140,7 @@ export default function LoginPage() {
           {/* Forgot Password */}
           <div className="text-center">
             <button
+              onClick={() => setModalOpen(true)}
               type="button"
               className="text-emerald-700 text-sm font-medium hover:underline"
             >
@@ -222,6 +225,8 @@ export default function LoginPage() {
           </div>
         </div>
       )}
+
+      {modalOpen && <PasswordRequestModal setModalOpen={setModalOpen} />}
     </div>
   );
 }

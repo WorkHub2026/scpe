@@ -17,7 +17,6 @@ export const markNotificationAsRead = async (adminId: number) => {
 
 export const getNotifications = async (adminId: number) => {
   const resp = await prisma.notification.findMany({
-    orderBy: { created_at: "desc" },
     where: {
       receiver_id: adminId,
     },

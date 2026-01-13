@@ -33,7 +33,7 @@ export async function createUser(data: {
 }
 
 export async function getUserById(user_id: number) {
-  return prisma.user.findUnique({ where: { user_id } });
+  return prisma.user.findFirst({ where: { user_id } });
 }
 
 export async function listUsers() {
@@ -46,12 +46,7 @@ export async function listUsers() {
 export async function updateUser(
   user_id: number,
   data: Partial<{
-    username: string;
-    email: string;
     password?: string;
-    role?: "Admin" | "MinistryUser";
-    status?: boolean;
-    ministry_id?: number | null;
   }>
 ) {
   const updateData: any = { ...data };
@@ -59,7 +54,6 @@ export async function updateUser(
     updateData.password_hash = await hashPassword(data.password);
     delete updateData.password;
   }
-  if (data.email) updateData.email = data.email.toLowerCase();
   return prisma.user.update({
     where: { user_id },
     data: updateData,
@@ -93,13 +87,13 @@ export async function loginUser(username: string, password: string) {
 }
 
 export async function resetPasswordByUsername(
-  username: string,
+  user_id: number,
   newPass: string
 ) {
   try {
     // 1. Check if user exists
-    const user = await prisma.user.findUnique({
-      where: { username },
+    const user = await prisma.user.findFirst({
+      where: { user_id },
     });
 
     if (!user) {
@@ -111,7 +105,7 @@ export async function resetPasswordByUsername(
 
     // 3. Update the database
     await prisma.user.update({
-      where: { username },
+      where: { user_id },
       data: { password_hash: hashedPassword },
     });
 

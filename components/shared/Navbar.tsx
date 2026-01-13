@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { LogOut, KeyRound, User, CheckCircle, AlertCircle } from "lucide-react";
-import { submitPasswordRequest } from "@/lib/services/passwordRequest.service";
+import { LogOut, User } from "lucide-react";
+import Link from "next/link";
 import NotificationBell from "../NotificationBell";
 export default function Navbar({
   user,
@@ -22,7 +22,7 @@ export default function Navbar({
   onSubmitPasswordRequest?: (message: string) => Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
+
   const [requestMessage, setRequestMessage] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,29 +41,6 @@ export default function Navbar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSubmitRequest = async () => {
-    if (!requestMessage.trim()) return;
-    try {
-      setIsSubmitting(true);
-      const resp = await submitPasswordRequest(user.user_id, requestMessage);
-      if (resp?.status === "PENDING") {
-        setToast({
-          type: "error",
-          message: "You already have a pending request.",
-        });
-      } else {
-        setToast({
-          type: "success",
-          message: "Your password change request has been sent to the admin.",
-        });
-      }
-      setRequestMessage("");
-      setModalOpen(false);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   return (
     <>
       <nav className="bg-[#004225] border-b border-[#003218] sticky top-0 z-50 shadow-lg">
@@ -72,13 +49,15 @@ export default function Navbar({
             {/* Logo + Name */}
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg overflow-hidden shadow-lg">
-                <Image
-                  src="/somaliland-seal.png"
-                  alt="Somaliland Seal"
-                  width={40}
-                  height={40}
-                  className="w-full h-full object-cover"
-                />
+                <Link href="/">
+                  <Image
+                    src="/somaliland-seal.png"
+                    alt="Somaliland Seal"
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white leading-tight">
@@ -131,18 +110,6 @@ export default function Navbar({
                     </div>
 
                     {/* Request Password Change: Only Ministry Users */}
-                    {user.role === "MinistryUser" && (
-                      <button
-                        onClick={() => {
-                          setOpen(false);
-                          setModalOpen(true);
-                        }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-xs text-white/90 hover:bg-white/10 transition"
-                      >
-                        <KeyRound className="w-4 h-4" />
-                        Request Password Change
-                      </button>
-                    )}
 
                     {/* Logout */}
                     <button
@@ -162,59 +129,6 @@ export default function Navbar({
           </div>
         </div>
       </nav>
-
-      {/* Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-bold mb-4">Request Password Change</h2>
-            <textarea
-              value={requestMessage}
-              onChange={(e) => setRequestMessage(e.target.value)}
-              placeholder="Enter message for admin..."
-              className="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setModalOpen(false)}
-                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmitRequest}
-                disabled={isSubmitting}
-                className="px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition"
-              >
-                {isSubmitting ? "Submitting..." : "Submit Request"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {toast && (
-        <div
-          className={`fixed top-6 right-6 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 text-white
-      ${toast.type === "success" ? "bg-emerald-600" : "bg-red-500"}
-    `}
-        >
-          {toast.type === "success" ? (
-            <CheckCircle className="w-5 h-5" />
-          ) : (
-            <AlertCircle className="w-5 h-5" />
-          )}
-
-          <span>{toast.message}</span>
-
-          <button
-            onClick={() => setToast(null)}
-            className="ml-3 text-white/70 hover:text-white"
-          >
-            ✕
-          </button>
-        </div>
-      )}
     </>
   );
 }

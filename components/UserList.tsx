@@ -1,8 +1,12 @@
+"use client";
 import { Edit2, Trash2 } from "lucide-react";
+import { EditUserModal } from "./users/EditUserModal";
+import { useState } from "react";
+import { Dialog, DialogTrigger } from "./ui/dialog";
+import { Button } from "./ui/button";
 
 const UserList = ({
   users,
-  onEdit,
   onDelete,
 }: {
   users: Array<{
@@ -13,16 +17,9 @@ const UserList = ({
     role: string;
     status: boolean;
   }>;
-  onEdit: (user: {
-    user_id: number;
-    username: string;
-    ministry: string | { name: string };
-    email: string;
-    role: string;
-    status: boolean;
-  }) => void;
   onDelete: (userId: number) => void;
 }) => {
+  const [openEditModal, setOpenEditModal] = useState(false);
   return (
     <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-[#004225]/30 overflow-hidden shadow-lg">
       <div className="overflow-x-auto">
@@ -84,12 +81,19 @@ const UserList = ({
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm flex gap-2 justify-center">
-                  <button
-                    onClick={() => onEdit(user)}
-                    className="p-2 text-[#004225] hover:bg-[#004225]/10 rounded-lg transition-colors duration-300"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="p-2 bg-transparent text-[#004225] hover:bg-[#004225]/10 rounded-lg transition-colors duration-300">
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                    </DialogTrigger>
+
+                    <EditUserModal
+                      userId={user.user_id}
+                      onClose={() => setOpenEditModal(false)}
+                    />
+                  </Dialog>
+
                   <button
                     onClick={() => onDelete(user.user_id)}
                     className="p-2 text-red-600 hover:bg-red-100/80 rounded-lg transition-colors duration-300"

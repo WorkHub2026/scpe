@@ -67,13 +67,13 @@ export default function Sidebar<T extends string>({
     },
     {
       id: "crisis",
-      label: "Crisis Response",
+      label: "Emergency Incident Management",
       icon: AlertTriangle,
       roles: ["Admin", "MinistryUser"],
     },
     {
       id: "policy",
-      label: "Policy",
+      label: "Emergency Protocols",
       icon: FileCode,
       roles: ["Admin", "MinistryUser"],
     },

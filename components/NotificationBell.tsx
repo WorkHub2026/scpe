@@ -9,16 +9,15 @@ import {
 
 export default function NotificationBell({ userId }: { userId: number }) {
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<any>([]);
   const [unread, setUnread] = useState(0);
 
-  async function loadData() {
-    const list: any = await getNotifications(userId);
-    setNotifications(list.resp);
-    setUnread(list?.filter((n: any) => !n.is_read).length);
-  }
-
   useEffect(() => {
+    async function loadData() {
+      const list: any = await getNotifications(userId);
+      setNotifications(list);
+      setUnread(list?.filter((n: any) => !n.is_read).length);
+    }
     loadData();
   }, []);
 
@@ -27,6 +26,8 @@ export default function NotificationBell({ userId }: { userId: number }) {
     setUnread(0);
     setOpen(true);
   }
+
+  console.log(notifications);
 
   return (
     <div className="relative">

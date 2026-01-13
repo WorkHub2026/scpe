@@ -8,7 +8,7 @@ import {
   listUsers,
   updateUser,
 } from "@/lib/services/userService";
-import { Edit2, Plus, Trash2, Users, X } from "lucide-react";
+import { Plus, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 // Types for form (optional but recommended)
@@ -25,7 +25,10 @@ export default function UserManagementView() {
     Array<{
       user_id: number;
       username: string;
-      ministry_id: string;
+      ministry: {
+        name: string;
+        ministry_id: number;
+      };
       email: string;
       role: string;
       status: boolean;
@@ -95,20 +98,6 @@ export default function UserManagementView() {
 
   const handleDeleteUser = async (id: number) => {
     await deleteUser(id);
-  };
-
-  const handleEditUser = async (user: any) => {
-    try {
-      await updateUser(user.id, {
-        username: formData.name,
-        email: formData.email,
-        password: formData.password,
-        ministry_id: Number(formData.ministry_id),
-        role: formData.role as "Admin" | "MinistryUser" | undefined,
-      });
-    } catch (error) {
-      console.log("Error at updating a user:", error);
-    }
   };
 
   return (
@@ -237,11 +226,7 @@ export default function UserManagementView() {
         </div>
       )}
 
-      <UserList
-        users={users}
-        onEdit={handleEditUser}
-        onDelete={handleDeleteUser}
-      />
+      <UserList users={users} onDelete={handleDeleteUser} />
     </div>
   );
 }

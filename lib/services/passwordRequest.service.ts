@@ -2,28 +2,14 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 export const submitPasswordRequest = async (
-  userId: number,
+  ministry: string,
   reason?: string
 ) => {
   try {
-    const existingRequest = await prisma.passwordResetRequest.findFirst({
-      where: {
-        userId,
-        status: "PENDING",
-      },
-    });
-
-    if (existingRequest) {
-      return existingRequest;
-    }
-
     const req = await prisma.passwordResetRequest.create({
       data: {
-        userId,
+        ministry,
         reason: reason,
-      },
-      include: {
-        user: true,
       },
     });
 
@@ -36,8 +22,7 @@ export const submitPasswordRequest = async (
     await prisma.notification.createMany({
       data: admins.map((admin) => ({
         title: "Password Reset Request",
-        message: `${req.user.username} has requested a password change.`,
-        sender_id: req.user.user_id,
+        message: `${req.ministry} has requested a password change.`,
         receiver_id: admin.user_id,
       })),
     });
@@ -51,16 +36,6 @@ export const adminGetsPasswordRequests = async () => {
   try {
     const requests = await prisma.passwordResetRequest.findMany({
       orderBy: { createdAt: "desc" },
-      include: {
-        user: {
-          select: {
-            user_id: true,
-            email: true,
-            username: true,
-            ministry: true,
-          },
-        },
-      },
     });
 
     return requests;
@@ -69,21 +44,17 @@ export const adminGetsPasswordRequests = async () => {
     throw new Error("Failed to get password requests");
   }
 };
-
 export const reviewResetRequest = async (
   requestId: number,
   status: "APPROVED" | "REJECTED",
-  adminId: number,
-  adminNote?: string
+  adminId: number
 ) => {
   try {
     return await prisma.passwordResetRequest.update({
       where: { id: requestId },
       data: {
         status,
-        adminNote,
         reviewedBy: adminId,
-        reviewedAt: new Date(),
       },
     });
   } catch (error) {
@@ -108,13 +79,4 @@ export const adminResetsUserPassword = async (
     console.log(error);
     throw new Error("Failed to reset user password");
   }
-};
-
-export const userHasPendingRequest = async (userId: number) => {
-  return prisma.passwordResetRequest.findFirst({
-    where: {
-      userId: userId,
-      status: "PENDING",
-    },
-  });
 };
