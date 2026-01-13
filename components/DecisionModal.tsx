@@ -1,3 +1,4 @@
+"use client";
 export default function DecisionModal({
   onClose,
   formData,

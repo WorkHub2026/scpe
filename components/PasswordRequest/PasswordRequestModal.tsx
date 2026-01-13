@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { submitPasswordRequest } from "@/lib/services/passwordRequest.service";
 type Toast = { type: "success" | "error"; message: string } | null;

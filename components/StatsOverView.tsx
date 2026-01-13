@@ -1,3 +1,4 @@
+"use client";
 import { FileText, Clock, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function StatsOverview({ documents }: { documents: any[] }) {

@@ -1,3 +1,4 @@
+"use client";
 import { CheckCircle, Clock, FileText } from "lucide-react";
 
 const DocumentStat = ({ documents }: { documents: any[] }) => {

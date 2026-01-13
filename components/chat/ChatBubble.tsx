@@ -1,3 +1,4 @@
+"use client";
 export default function ChatBubble({ message }: any) {
   const isAdmin = message.sender.role === "Admin";
 
