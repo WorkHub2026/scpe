@@ -67,13 +67,13 @@ export default function Sidebar<T extends string>({
     },
     {
       id: "crisis",
-      label: "Emergency Incident Management",
+      label: "EMR Incident Management",
       icon: AlertTriangle,
       roles: ["Admin", "MinistryUser"],
     },
     {
       id: "policy",
-      label: "Emergency Protocols",
+      label: "EMR Protocols",
       icon: FileCode,
       roles: ["Admin", "MinistryUser"],
     },
@@ -100,13 +100,13 @@ export default function Sidebar<T extends string>({
               <button
                 onClick={() => setCurrentView(id as any)}
                 className={`
-    relative w-52 px-4 py-3 rounded-xl flex items-center gap-3 transition-all duration-300
-    ${
-      currentView === id
-        ? "bg-[#004225] text-white shadow-lg shadow-[#004225]/40 scale-[1.03]"
-        : "bg-white/60 text-[#004225] hover:bg-white/80 hover:scale-[1.02]"
-    }
-  `}
+                  relative w-52 px-4 py-3 rounded-xl flex items-center gap-3 transition-all duration-300
+                  ${
+                    currentView === id
+                      ? "bg-[#004225] text-white shadow-lg shadow-[#004225]/40 scale-[1.03]"
+                      : "bg-white/60 text-[#004225] hover:bg-white/80 hover:scale-[1.02]"
+                  }
+                `}
               >
                 {/* Icon */}
                 <Icon className="w-6 h-6 flex-shrink-0" />
@@ -121,12 +121,12 @@ export default function Sidebar<T extends string>({
               </button>
 
               {/* Tooltip */}
-              {/* <div className="absolute left-[210px] top-1/2 -translate-y-1/2 hidden group-hover:flex z-50 pointer-events-none">
+              <div className="absolute left-[210px] top-1/2 -translate-y-1/2 hidden group-hover:flex z-50 pointer-events-none">
                 <div className="bg-[#004225] text-white text-sm font-bold px-4 py-2 rounded-lg whitespace-nowrap shadow-xl">
                   {label}
                   <div className="absolute right-full mr-1 top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#004225]"></div>
                 </div>
-              </div> */}
+              </div>
             </div>
           ))}
         </div>
