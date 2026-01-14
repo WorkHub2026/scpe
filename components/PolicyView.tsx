@@ -39,7 +39,7 @@ const PolicyView = () => {
     <div className="space-y-8">
       <div>
         <h2 className="text-4xl font-bold bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-          Policy Management
+          Emergency & Crisis Policies
         </h2>
         <p className="text-gray-600 mt-3 flex items-center gap-2">
           <FileCode className="w-4 h-4 text-[#004225]" />
