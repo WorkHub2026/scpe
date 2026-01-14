@@ -67,13 +67,13 @@ export default function Sidebar<T extends string>({
     },
     {
       id: "crisis",
-      label: "EMR Incident Management",
+      label: "Emergency & Crisis Response",
       icon: AlertTriangle,
       roles: ["Admin", "MinistryUser"],
     },
     {
       id: "policy",
-      label: "EMR Protocols",
+      label: "Emergency & Crisis Policies",
       icon: FileCode,
       roles: ["Admin", "MinistryUser"],
     },
