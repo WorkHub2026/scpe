@@ -46,11 +46,11 @@ export default function RequestsTable({ requests }: { requests: any[] }) {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="p-3 text-left">User</th>
-              <th className="p-3 text-left">Message</th>
-              <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-left">Requested</th>
-              <th className="p-3 text-right">Action</th>
+              <th className="p-3 text-left">Adeegsade </th>
+              <th className="p-3 text-left">Dhambaal</th>
+              <th className="p-3 text-left">Xaalad</th>
+              <th className="p-3 text-left">Codsi</th>
+              <th className="p-3 text-right">Tallaabo </th>
             </tr>
           </thead>
 
@@ -68,8 +68,8 @@ export default function RequestsTable({ requests }: { requests: any[] }) {
                         r.status === "PENDING"
                           ? "bg-yellow-100 text-yellow-800"
                           : r.status === "APPROVED"
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-red-100 text-red-800"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-red-100 text-red-800"
                       }`}
                   >
                     {r.status}
@@ -99,7 +99,7 @@ export default function RequestsTable({ requests }: { requests: any[] }) {
                         ) : (
                           <Check className="w-4 h-4" />
                         )}
-                        Approve
+                        Ansax
                       </button>
 
                       <button
@@ -111,21 +111,19 @@ export default function RequestsTable({ requests }: { requests: any[] }) {
                         className="px-3 py-2 bg-red-600 text-white rounded-lg flex items-center gap-2 disabled:opacity-60"
                       >
                         <X className="w-4 h-4" />
-                        Reject
+                        Diidmo
                       </button>
                     </>
                   )}
 
                   {/* Approved: Change Key */}
                   {r.status === "APPROVED" && (
-                    <p className="text-gray-400">{r.status}</p>
+                    <p className="text-gray-400">Ansax</p>
                   )}
 
                   {/* Rejected */}
                   {r.status === "REJECTED" && (
-                    <span className="text-sm text-gray-500 italic">
-                      Rejected
-                    </span>
+                    <span className="text-sm text-gray-500 italic">Diidmo</span>
                   )}
                 </td>
               </tr>
@@ -133,40 +131,6 @@ export default function RequestsTable({ requests }: { requests: any[] }) {
           </tbody>
         </table>
       </div>
-
-      {/* Reset Password Modal */}
-      {resetId && (
-        <div className="fixed inset-0 bg-black/40 grid place-items-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-[380px] shadow-xl">
-            <h2 className="text-lg font-semibold mb-2">Change User Password</h2>
-
-            <p className="text-sm text-gray-500 mb-4">
-              Enter the new password for this user.
-            </p>
-
-            <input
-              type="password"
-              placeholder="New password"
-              className="border p-2 rounded w-full"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-
-            <div className="flex justify-end gap-3 mt-5">
-              <button onClick={() => setResetId(null)}>Cancel</button>
-
-              <button
-                disabled={saving}
-                onClick={submitReset}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg flex items-center gap-2 disabled:opacity-60"
-              >
-                {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                Save Password
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

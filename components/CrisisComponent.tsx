@@ -55,7 +55,7 @@ const CrisisResponseView = () => {
     <div className="space-y-8">
       <div>
         <h2 className="text-4xl font-bold bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-          Emergency & Crisis Response
+          JAWAABTA XAALADAHA ADAG
         </h2>
         <p className="text-gray-600 mt-3 flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-red-500" />
@@ -69,7 +69,7 @@ const CrisisResponseView = () => {
             className="flex items-center gap-2 px-6 py-3 bg-[#004225] hover:bg-[#003218] text-white rounded-xl font-bold transition-all duration-300 shadow-lg shadow-[#004225]/30"
           >
             <Plus className="w-5 h-5" />
-            Add Crisis Response
+            Diiwaangeli xaalad adag
           </button>
         </div>
       )}
@@ -79,7 +79,7 @@ const CrisisResponseView = () => {
           <div className="bg-white rounded-xl p-8 max-w-2xl w-full shadow-2xl space-y-6">
             <div className="flex justify-between items-center">
               <h3 className="text-2xl font-bold text-gray-900">
-                Add Crisis Response
+                Diiwaangeli xaalad adag
               </h3>
               <button
                 onClick={() => setShowCrisisModal(false)}
@@ -141,7 +141,7 @@ const CrisisResponseView = () => {
                 onClick={handlePostCrisis}
                 className="flex-1 px-6 py-3 bg-[#004225] hover:bg-[#003218] text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-[#004225]/30"
               >
-                Add Response
+                Jawaabta
               </button>
 
               <button

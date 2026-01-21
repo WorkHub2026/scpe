@@ -39,8 +39,8 @@ export default function Sidebar<T extends string>({
 }: SidebarProps<T>) {
   const allLinks = [
     // ✅ Admin routes
-    { id: "dashboard", label: "Dashboard", icon: Home, roles: ["Admin"] },
-    { id: "users", label: "User Management", icon: Users, roles: ["Admin"] },
+    { id: "dashboard", label: "Wajahaadda", icon: Home, roles: ["Admin"] },
+    { id: "users", label: "Adeegsadaha", icon: Users, roles: ["Admin"] },
     {
       id: "documents",
       label: "Documents",
@@ -49,37 +49,37 @@ export default function Sidebar<T extends string>({
     },
     {
       id: "profiles",
-      label: "Ministry Profile",
+      label: "Xogta Hay’adda",
       icon: Package,
       roles: ["Admin"],
     },
     {
       id: "requests",
-      label: "Password Requests",
+      label: "Codsiga Furaha",
       icon: Key,
       roles: ["Admin"],
     },
     {
       id: "announcements",
-      label: "Announcements",
+      label: "Farriimaha",
       icon: Mail,
       roles: ["Admin", "MinistryUser"],
     },
     {
       id: "crisis",
-      label: "Emergency & Crisis Response",
+      label: "Jawaabta Xaaladaha adag",
       icon: AlertTriangle,
       roles: ["Admin", "MinistryUser"],
     },
     {
       id: "policy",
-      label: "Emergency & Crisis Policies",
+      label: "Siyaasadda Xaaladaha adag",
       icon: FileCode,
       roles: ["Admin", "MinistryUser"],
     },
     {
       id: "digital-assets",
-      label: "Somaliland Brand",
+      label: "Bookho Bogga Astaamaha xukumadaha",
       icon: Zap,
       roles: ["Admin", "MinistryUser"],
     },

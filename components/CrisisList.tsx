@@ -45,9 +45,9 @@ const CrisisList = ({ role }: { role: string | undefined }) => {
       {crisisResponses.length > 0 ? (
         crisisResponses?.map((item: any) => (
           <div
-            // onClick={() => router.push(`/crisis/${item.id}`)}
+            onClick={() => router.push(`/crisis/${item.id}`)}
             key={item.id}
-            className="bg-white/70 backdrop-blur-sm p-6 rounded-xl border border-emerald-200/50 hover:shadow-lg transition-all duration-300"
+            className="bg-white/70 backdrop-blur-sm p-6 rounded-xl border border-emerald-200/50 hover:shadow-lg transition-all duration-300 cursor-pointer"
           >
             <div className="flex justify-between items-start mb-3">
               <div>
@@ -57,7 +57,7 @@ const CrisisList = ({ role }: { role: string | undefined }) => {
                   </h3>
                   <span
                     className={`text-xs px-3 py-1 rounded-full font-bold uppercase ${getPriorityBadge(
-                      item.priority
+                      item.priority,
                     )}`}
                   >
                     {item.priority} Priority

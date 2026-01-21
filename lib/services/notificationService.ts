@@ -4,7 +4,7 @@ export const createAnnouncement = async (
   title: string,
   content: string,
   image_path: string | null,
-  created_by: number
+  created_by: number,
 ) => {
   try {
     const announcement = await prisma.announcement.create({
@@ -41,5 +41,22 @@ export const getAnnouncements = async () => {
   } catch (error) {
     console.error("Error fetching announcements:", error);
     throw error;
+  }
+};
+
+export const deleteAnnouncement = async (id: number) => {
+  try {
+    await prisma.announcement.delete({
+      where: { announcement_id: id },
+    });
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error deleting announcement:", error);
+    return {
+      success: false,
+      error: "Failed to delete announcement",
+    };
   }
 };

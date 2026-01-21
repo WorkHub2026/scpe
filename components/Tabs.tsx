@@ -19,7 +19,9 @@ export default function Tabs({
                 : "border-transparent text-gray-600 hover:text-gray-900"
             }`}
           >
-            {tab === "submissions" ? "Recent Submissions" : "Ministry Overview"}
+            {tab === "submissions"
+              ? "Soo-gudbintii u dambaysay"
+              : "Diiwaanka Guud"}
           </button>
         ))}
       </div>

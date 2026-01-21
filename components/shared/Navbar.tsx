@@ -9,7 +9,6 @@ export default function Navbar({
   user,
   ministry,
   onLogout,
-  onSubmitPasswordRequest, // handler for submitting the request
 }: {
   user: {
     user_id: number;
@@ -19,17 +18,9 @@ export default function Navbar({
   };
   ministry?: string;
   onLogout: () => void;
-  onSubmitPasswordRequest?: (message: string) => Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
-
-  const [requestMessage, setRequestMessage] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [toast, setToast] = useState<null | {
-    type: "success" | "error";
-    message: string;
-  }>(null);
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -61,10 +52,10 @@ export default function Navbar({
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white leading-tight">
-                  Republic of Somaliland
+                  Jamhuuriyadda Somaliland
                 </h1>
                 <p className="text-sm font-semibold text-white/90">
-                  Government Communications
+                 Nidaamka War-isgaadhsiinta Xukuumadda
                 </p>
               </div>
             </div>
@@ -75,14 +66,14 @@ export default function Navbar({
               <div className="hidden md:flex items-center gap-3 px-4 py-2 bg-white/20 rounded-lg border border-white/30">
                 <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                 <div className="text-sm">
-                  <p className="font-medium text-white">{user.username}</p>
+                  <p className="font-medium text-white">{user?.username}</p>
                   {ministry && (
                     <p className="text-xs text-white/60">{ministry}</p>
                   )}
                 </div>
               </div>
 
-              {user.role === "Admin" && (
+              {user?.role === "Admin" && (
                 <NotificationBell userId={user.user_id} />
               )}
 
@@ -100,7 +91,7 @@ export default function Navbar({
                     {/* Header */}
                     <div className="px-4 py-3 border-b border-[#003218]">
                       <p className="text-white font-medium text-sm">
-                        {user.username}
+                        {user?.username}
                       </p>
                       {ministry && (
                         <p className="text-xs text-white/60 truncate">

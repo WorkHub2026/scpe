@@ -4,35 +4,35 @@ import { FileText, Clock, CheckCircle, AlertCircle } from "lucide-react";
 export default function StatsOverview({ documents }: { documents: any[] }) {
   const total = documents.length;
   const underReview = documents.filter(
-    (d) => d.status === "under-review"
+    (d) => d.status === "under-review",
   ).length;
   const accepted = documents.filter((d) => d.status === "Accepted").length;
   const denied = documents.filter((d) => d.status === "Denied").length;
 
   const stats = [
     {
-      label: "Total Submissions",
+      label: "Wadarta Soo-gudubtay (Bishan)	",
       value: total,
       icon: FileText,
       color: "emerald",
       trend: "+12%",
     },
     {
-      label: "Under Review",
+      label: "Sugitaan",
       value: underReview,
       icon: Clock,
       color: "amber",
       trend: "+3%",
     },
     {
-      label: "Accepted",
+      label: "Ansixid	",
       value: accepted,
       icon: CheckCircle,
       color: "emerald",
       trend: "+5%",
     },
     {
-      label: "Denied",
+      label: "Diidis",
       value: denied,
       icon: AlertCircle,
       color: "red",

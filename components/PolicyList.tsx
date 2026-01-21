@@ -2,11 +2,14 @@
 import { useAuth } from "@/context/AuthContext";
 import { deletePolicy, getAllPolicy } from "@/lib/services/policy.service";
 import { Download, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const PolicyList = () => {
   const [policies, setPolicies] = useState([]);
   const { user } = useAuth();
+  const router = useRouter();
   const fetchPolicy = async () => {
     try {
       const data: any = await getAllPolicy();
@@ -48,8 +51,9 @@ const PolicyList = () => {
       {policies?.length > 0 ? (
         policies?.map((item: any, index: number) => (
           <div
-            key={item.id ?? `doc-${index}`}
-            className="group relative bg-white/70 backdrop-blur-sm p-6 rounded-xl border border-emerald-200/50 hover:shadow-lg transition-all duration-300"
+            onClick={() => router.push(`/policy/${item.id}`)}
+            key={index}
+            className="bg-white/70 backdrop-blur-sm p-6 rounded-xl border border-emerald-200/50 hover:shadow-lg transition-all duration-300 cursor-pointer"
           >
             {/* Top Section */}
             <div className="flex justify-between items-start mb-3">

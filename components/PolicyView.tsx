@@ -39,7 +39,7 @@ const PolicyView = () => {
     <div className="space-y-8">
       <div>
         <h2 className="text-4xl font-bold bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-          Emergency & Crisis Policies
+          Siyaasadda Xaaladaha adag
         </h2>
         <p className="text-gray-600 mt-3 flex items-center gap-2">
           <FileCode className="w-4 h-4 text-[#004225]" />
@@ -54,7 +54,7 @@ const PolicyView = () => {
             className="flex items-center gap-2 px-6 py-3 bg-[#004225] hover:bg-[#003218] text-white rounded-xl font-bold transition-all duration-300 shadow-lg shadow-[#004225]/30"
           >
             <Plus className="w-5 h-5" />
-            Upload Policy
+            Lifaaqid
           </button>
         )}
       </div>
@@ -63,9 +63,7 @@ const PolicyView = () => {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl p-8 max-w-2xl w-full shadow-2xl space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-2xl font-bold text-gray-900">
-                Upload Policy
-              </h3>
+              <h3 className="text-2xl font-bold text-gray-900">Lifaaqid</h3>
               <button
                 onClick={() => setShowPolicyModal(false)}
                 className="text-gray-500 hover:text-gray-700"

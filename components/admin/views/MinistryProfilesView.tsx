@@ -75,7 +75,7 @@ export default function MinistryProfilesView() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-            Ministry Profiles
+            XOGTA HAY’ADDA
           </h2>
           <p className="text-gray-600 mt-3 flex items-center gap-2">
             <FileText className="w-4 h-4 text-[#004225]" />
@@ -87,7 +87,7 @@ export default function MinistryProfilesView() {
           className="flex items-center gap-2 px-6 py-3 bg-[#004225] hover:bg-[#003218] text-white rounded-lg font-bold transition-all duration-300 shadow-lg"
         >
           <Plus className="w-5 h-5" />
-          Add New Ministry
+          Diiwaangeli Hay’ad cusub
         </button>
       </div>
 

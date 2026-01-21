@@ -19,7 +19,7 @@ const PasswordRequest = () => {
   }, []);
   return (
     <div className="">
-      <h1 className="text-xl font-bold mb-4">Password Reset Request</h1>
+      <h1 className="text-xl font-bold mb-4">DIB-U-CUSBOONAYSIINIT GELITAANKA </h1>
       <PasswordRequestTable requests={requests} />
     </div>
   );

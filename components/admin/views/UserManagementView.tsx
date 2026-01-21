@@ -104,11 +104,11 @@ export default function UserManagementView() {
     <div className="space-y-8">
       <div>
         <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-          User Management
+          DIIWAANKA ADEEGSADAHA
         </h2>
         <p className="text-gray-600 mt-3 flex items-center gap-2">
           <Users className="w-4 h-4 text-emerald-500" />
-          Manage minister users and their platform access
+          Maaraynta adeegsadayaasha
         </p>
       </div>
       <button
@@ -119,7 +119,7 @@ export default function UserManagementView() {
         className="flex items-center gap-2 px-6 py-3 bg-[#004225] hover:bg-[#003218] text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-[#004225]/30"
       >
         <Plus className="w-5 h-5" />
-        Add New User
+        Ku dar maamule cusub
       </button>
       {isAddingUser && (
         <div className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-[#004225]/30 shadow-lg">

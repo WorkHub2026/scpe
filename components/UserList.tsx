@@ -27,22 +27,22 @@ const UserList = ({
           <thead>
             <tr className="bg-gradient-to-r from-[#004225]/10 to-[#004225]/5 border-b border-[#004225]/30">
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">
-                Name
+                Magaca
               </th>
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">
-                Ministry
+                Hay’adda
               </th>
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">
-                Phone Number
+                Talefanka
               </th>
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">
-                Role
+                Kaalinta
               </th>
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">
-                Status
+                Xaaladda
               </th>
               <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase">
-                Actions
+                Tallaabada
               </th>
             </tr>
           </thead>

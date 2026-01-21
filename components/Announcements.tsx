@@ -7,6 +7,7 @@ import AnnouncementList from "./AnnouncementList";
 import {
   getAnnouncements,
   createAnnouncement,
+  deleteAnnouncement,
 } from "@/lib/services/notificationService";
 import { useAuth } from "@/context/AuthContext";
 const Announcements = () => {
@@ -44,6 +45,11 @@ const Announcements = () => {
     fetchAnnouncements();
   }, []);
 
+  const handleDelete = async (id: number) => {
+    await deleteAnnouncement(id);
+    await fetchAnnouncements();
+  };
+
   // Handle form submission
   const handleAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +76,7 @@ const Announcements = () => {
         formData.title,
         formData.content,
         imageUrl,
-        user?.user_id ?? 0
+        user?.user_id ?? 0,
       );
 
       setUpload(false);
@@ -88,9 +94,7 @@ const Announcements = () => {
     <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="flex flex-col space-y-2">
-        <h1 className="text-4xl text-slate-800 font-bold">
-          Broadcast Announcements
-        </h1>
+        <h1 className="text-4xl text-slate-800 font-bold">FARRIIN</h1>
         <p className="flex items-center gap-1 text-gray-600">
           <Mail className="w-4 h-4" />
           Send messages and announcements to all ministry users
@@ -103,7 +107,7 @@ const Announcements = () => {
         className="flex justify-center items-center w-64 px-4 gap-2 py-3 bg-[#004225] hover:bg-[#003218] text-white rounded-lg font-semibold transition"
       >
         <Send className="w-5 h-5" />
-        Post Announcement
+        Baahinta farriinta
       </button>
 
       {/* Announcement Form */}
@@ -129,7 +133,7 @@ const Announcements = () => {
           No announcements available.
         </p>
       ) : (
-        <AnnouncementList data={announcements} />
+        <AnnouncementList data={announcements} handleDelete={handleDelete} />
       )}
     </div>
   );

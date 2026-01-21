@@ -63,7 +63,7 @@ const AnnouncementForm = ({
       className="mt-6 flex flex-col gap-6 p-6 border border-gray-300 rounded-lg"
     >
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">New Announcement</h2>
+        <h2 className="text-2xl font-bold">Baahinta farriinta</h2>
         <X
           className="cursor-pointer hover:bg-green-100 hover:rounded-md p-1"
           onClick={() => setUpload(false)}

@@ -1,5 +1,5 @@
 "use server";
-import fs from "fs";
+import * as fs from "fs";
 import path from "path";
 import mammoth from "mammoth";
 
@@ -8,7 +8,6 @@ import { prisma } from "../prisma";
 export const getAllPolicy = async () => {
   try {
     const resp = await prisma.policy.findMany();
-
     return {
       success: true,
       data: resp,
@@ -84,3 +83,42 @@ export const deletePolicy = async (id: number) => {
     };
   }
 };
+
+export async function getPolicyById(id: number) {
+  const policy = await prisma.policy.findUnique({
+    where: { id },
+    include: {
+      author: {
+        select: {
+          username: true,
+        },
+      },
+    },
+  });
+
+  if (!policy) return null;
+
+  // ✅ FIX: avoid path duplication
+  const filePath = path.join(process.cwd(), "public", policy.file_path);
+
+  // ✅ SAFETY CHECK (prevents ENOENT)
+  try {
+    await fs.promises.access(filePath);
+  } catch {
+    throw new Error(`File not found: ${filePath}`);
+  }
+
+  let previewContent = "";
+
+  if (filePath.endsWith(".docx")) {
+    const result = await mammoth.convertToHtml({ path: filePath });
+    previewContent = result.value;
+  } else if (filePath.endsWith(".txt")) {
+    previewContent = await fs.promises.readFile(filePath, "utf-8");
+  }
+
+  return {
+    ...policy,
+    previewContent,
+  };
+}

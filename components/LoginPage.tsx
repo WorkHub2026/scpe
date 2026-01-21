@@ -78,10 +78,10 @@ export default function LoginPage() {
             />
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-[#004225] to-[#003218] bg-clip-text text-transparent mb-3">
-            Republic of Somaliland
+            Jamhuuriyadda Somaliland
           </h1>
           <p className="text-gray-600 text-lg">
-            Government Communication Platform
+            Nidaamka War-isgaadhsiinta Xukuumadda
           </p>
         </div>
 

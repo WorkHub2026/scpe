@@ -1,6 +1,7 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { Lato } from "next/font/google";
 import "./globals.css";
 
 import { AuthProvider } from "@/context/AuthContext";
@@ -28,6 +29,13 @@ export const metadata: Metadata = {
   },
 };
 
+const lato = Lato({
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  variable: "--font-lato",
+});
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,7 +43,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased`}>
+      <body
+        className={`font-sans antialiased bg-gray-100  ${lato.variable} font-lato`}
+      >
         <AuthProvider>{children}</AuthProvider>
 
         <Analytics />
