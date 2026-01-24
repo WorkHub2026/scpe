@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Lato } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -13,16 +14,16 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
+        url: "/icon.png",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/icon-dark-32x32.png",
+        url: "/icon.png",
         media: "(prefers-color-scheme: dark)",
       },
       {
-        url: "/icon.svg",
-        type: "image/svg+xml",
+        url: "/icon.png",
+        type: "image/png",
       },
     ],
     apple: "/apple-icon.png",
@@ -34,7 +35,6 @@ const lato = Lato({
   weight: ["400", "700", "900"],
   variable: "--font-lato",
 });
-
 
 export default function RootLayout({
   children,
@@ -49,6 +49,7 @@ export default function RootLayout({
         <AuthProvider>{children}</AuthProvider>
 
         <Analytics />
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

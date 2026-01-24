@@ -43,7 +43,7 @@ export default function Sidebar<T extends string>({
     { id: "users", label: "Adeegsadaha", icon: Users, roles: ["Admin"] },
     {
       id: "documents",
-      label: "Documents",
+      label: "Waraaqaha(Documents)",
       icon: FileText,
       roles: ["MinistryUser"],
     },

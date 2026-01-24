@@ -10,7 +10,7 @@ import {
 } from "@/lib/services/userService";
 import { Plus, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
-
+import { toast } from "sonner";
 // Types for form (optional but recommended)
 interface UserForm {
   name: string;
@@ -91,6 +91,7 @@ export default function UserManagementView() {
       });
 
       setIsAddingUser(false);
+      toast.success("User created successfully ✅");
     } catch (error) {
       console.log("Error at creating user:", error);
     }

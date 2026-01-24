@@ -3,10 +3,13 @@
 import { useState, useEffect } from "react";
 import AnnouncementList from "@/components/AnnouncementList";
 import { Mail } from "lucide-react";
-import { getAnnouncements } from "@/lib/services/notificationService";
+import {
+  deleteAnnouncement,
+  getAnnouncements,
+} from "@/lib/services/notificationService";
 
 interface Announcement {
-  id: number;
+  announcement_id: number;
   title: string;
   content: string;
   image_path?: string;
@@ -45,13 +48,18 @@ const AnnouncementView = () => {
     fetchAnnouncements();
   }, []);
 
+  const handleDelete = async (id: number) => {
+    await deleteAnnouncement(id);
+    await fetchAnnouncements();
+  };
+
   return (
     <div className="flex flex-col gap-4 w-full">
       {/* Header */}
-      <h1 className="text-4xl text-slate-800 font-semibold">Inbox</h1>
+      <h1 className="text-4xl text-slate-800 font-semibold">Fariimaha</h1>
       <p className="flex items-center gap-1 text-gray-600">
         <Mail className="w-4 h-4" />
-        View announcements and messages from the communications team
+        Lasoco fariimaha muhiimka ah ee ka imanaya maamulka xukuumadda
       </p>
 
       {/* Status Feedback */}
@@ -61,12 +69,12 @@ const AnnouncementView = () => {
       {/* Announcement List */}
       {!loading && announcements.length === 0 && !error && (
         <p className="text-center text-gray-500 mt-10">
-          No announcements available.
+          Weli fariimo lama soo gudbin.
         </p>
       )}
 
       {!loading && announcements.length > 0 && (
-        <AnnouncementList data={announcements} />
+        <AnnouncementList data={announcements} handleDelete={handleDelete} />
       )}
     </div>
   );

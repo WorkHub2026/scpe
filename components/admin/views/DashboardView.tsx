@@ -7,6 +7,7 @@ import Tabs from "@/components/Tabs";
 import SubmissionList from "@/components/SubmissionList";
 import MinistryOverview from "@/components/MinistryOverview";
 import { listDocuments } from "@/lib/services/documentService";
+import { useAuth } from "@/context/AuthContext";
 
 export default function DashboardView({
   selectedTab,
@@ -18,6 +19,9 @@ export default function DashboardView({
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const { user } = useAuth();
+
+  console.log("DashboardView user:", user);
   useEffect(() => {
     const loadDocuments = async () => {
       try {

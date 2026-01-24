@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,8 +18,7 @@ import {
   resetPasswordByUsername,
   updateUser,
 } from "@/lib/services/userService";
-import { useEffect, useState } from "react";
-
+import { toast } from "sonner";
 export function EditUserModal({
   onClose,
   userId,
@@ -50,6 +50,7 @@ export function EditUserModal({
       await resetPasswordByUsername(user.user_id, newPassword);
       setLoading(false);
       onClose();
+      toast.success("User updated successfully ✅");
     } catch (error) {
       console.log("Error at updating a user:", error);
     }

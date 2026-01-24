@@ -33,7 +33,9 @@ export default function ListDocuments({ documents }: { documents: any[] }) {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-2xl font-bold text-gray-900 mb-6">Your Documents</h3>
+      <h3 className="text-2xl font-bold text-gray-900 mb-6">
+        Waraaqahaga(Documents)
+      </h3>
       {documents.length > 0 ? (
         documents.map((doc, index) => (
           <div
@@ -56,9 +58,7 @@ export default function ListDocuments({ documents }: { documents: any[] }) {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">
-                    {doc.ministry?.map((min: any) => (
-                      <span>{min.name}</span>
-                    ))}
+                    {doc.ministry.name}
                   </p>
                   <div className="flex gap-4 flex-wrap text-xs text-gray-500">
                     <span>
@@ -83,7 +83,7 @@ export default function ListDocuments({ documents }: { documents: any[] }) {
               <div className="flex flex-col gap-2 sm:col-span-1 sm:items-end">
                 <span
                   className={`px-4 py-2 rounded-lg text-sm font-bold text-center sm:text-right ${getStatusBadge(
-                    doc.status
+                    doc.status,
                   )}`}
                 >
                   {doc.status === "Submitted"

@@ -7,7 +7,7 @@ export default function BrandAssetsView() {
     <div className="space-y-8">
       <div>
         <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">
-          Somaliland Brand
+          Astaamaha xukuumadda Somaliland
         </h2>
         <p className="text-gray-600 flex items-center gap-2">
           <Package className="w-4 h-4 text-[#004225]" />

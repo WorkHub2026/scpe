@@ -12,7 +12,7 @@ const ReviewPage = () => {
   const { id } = useParams();
   const [data, setData] = useState<any>(null);
   const [status, setStatus] = useState<"Accepted" | "Denied" | "Revised">(
-    "Accepted"
+    "Accepted",
   );
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,6 +44,8 @@ const ReviewPage = () => {
     return <div>Loading...</div>;
   }
 
+  console.log("Document:", data);
+
   const handleSubmit = async () => {
     setLoading(true);
     try {
@@ -71,7 +73,7 @@ const ReviewPage = () => {
         <h2 className="text-2xl font-bold text-gray-900">{data.title}</h2>
         <p className="text-sm text-gray-600">
           Ministry: {data.ministry?.name || "N/A"} | Submitted By:{" "}
-          {data.submittedBy?.name || "N/A"}
+          {data.submittedBy?.username || "N/A"}
         </p>
 
         {/* Download button */}
@@ -116,49 +118,50 @@ const ReviewPage = () => {
           </p>
         </div>
 
-        {/* Reviewer Decision */}
-        <div className="space-y-2">
-          <label className="font-semibold">Decision</label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as any)}
-            className="px-4 py-2 border border-gray-300 rounded w-full"
-          >
-            <option value="Accepted">Accept</option>
-            <option value="Denied">Deny</option>
-            <option value="Revised">Request Revision</option>
-          </select>
-
-          <label className="font-semibold mt-2">Feedback</label>
-          <textarea
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded h-32 resize-none"
-            placeholder="Add feedback..."
-          />
-
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="px-4 py-2 bg-[#004225] text-white rounded hover:bg-[#003218]"
-          >
-            {loading ? "Submitting..." : "Submit Review"}
-          </button>
-        </div>
-
-        {/* Existing Feedback */}
-        {data.feedbacks?.length > 0 && (
-          <div className="mt-6">
-            <h3 className="font-bold">Previous Feedback</h3>
-            {data.feedbacks.map((fb: any, index: number) => (
-              <p
-                key={fb.id ?? `doc-${index}`}
-                className="text-sm mt-2 bg-[#004225]/10 p-2 rounded border border-[#004225]/30"
+        {user?.role === "Admin" && (
+          <>
+            <div className="space-y-2">
+              <label className="font-semibold">Decision</label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value as any)}
+                className="px-4 py-2 border border-gray-300 rounded w-full"
               >
-                {fb.feedback_text}
-              </p>
-            ))}
-          </div>
+                <option value="Accepted">Accept</option>
+                <option value="Denied">Deny</option>
+                <option value="Revised">Request Revision</option>
+              </select>
+
+              <label className="font-semibold mt-2">Feedback</label>
+              <textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded h-32 resize-none"
+                placeholder="Add feedback..."
+              />
+
+              <button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="px-4 py-2 bg-[#004225] text-white rounded hover:bg-[#003218]"
+              >
+                {loading ? "Submitting..." : "Submit Review"}
+              </button>
+            </div>
+            {data.feedbacks?.length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-bold">Previous Feedback</h3>
+                {data.feedbacks.map((fb: any, index: number) => (
+                  <p
+                    key={fb.id ?? `doc-${index}`}
+                    className="text-sm mt-2 bg-[#004225]/10 p-2 rounded border border-[#004225]/30"
+                  >
+                    {fb.feedback_text}
+                  </p>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         <Chat documentId={Number(id)} />

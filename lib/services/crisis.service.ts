@@ -18,14 +18,14 @@ export const getAllCrisis = async () => {
   }
 };
 
-export const createCrisis = async (data: {
-  title: string;
-  file: File;
-  created_by: number;
-  priority: "LOW" | "MEDIUM" | "HIGH";
-}) => {
+export const createCrisis = async (formData: FormData) => {
   try {
-    if (!data.file) throw new Error("No file uploaded");
+    const data = {
+      title: formData.get("title") as string,
+      file: formData.get("file") as File,
+      created_by: Number(formData.get("created_by")),
+      priority: formData.get("priority") as "LOW" | "MEDIUM" | "HIGH",
+    };
 
     const uploadDir = path.join(process.cwd(), "public", "uploads", "crisis");
 

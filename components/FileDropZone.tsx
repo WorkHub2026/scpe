@@ -63,6 +63,7 @@ export default function FileDropZone({
       <input
         type="file"
         id="fileInput"
+        name="file"
         hidden
         accept={accept}
         onChange={handleFileInput}

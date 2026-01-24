@@ -1,7 +1,7 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
-
+import { useAuth } from "@/context/AuthContext";
 interface Announcement {
   announcement_id: number;
   title: string;
@@ -22,6 +22,7 @@ const AnnouncementList = ({
   data: Announcement[];
   handleDelete: (id: number) => Promise<void>;
 }) => {
+  const { user } = useAuth();
   return (
     <div className="flex flex-col gap-6">
       {data?.map((announcement, index) => (
@@ -32,15 +33,17 @@ const AnnouncementList = ({
           <div className="flex flex-col gap-2 mb-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-semibold">{announcement.title}</h2>
-              <button
-                onClick={() => handleDelete(announcement.announcement_id)}
-                className="p-2 hover:bg-red-100 text-red-600 rounded-lg transition-colors duration-300"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
+              {user?.role === "Admin" && (
+                <button
+                  onClick={() => handleDelete(announcement.announcement_id)}
+                  className="p-2 hover:bg-red-100 text-red-600 rounded-lg transition-colors duration-300"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              )}
             </div>
             <p className="text-sm text-gray-500">
-              From: Admin &nbsp;|&nbsp; Date:
+              Ka Timi: Maamulka &nbsp;|&nbsp; Tarkh:
               {new Date(announcement.created_at).toLocaleDateString()}
             </p>
           </div>

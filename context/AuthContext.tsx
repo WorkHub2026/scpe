@@ -15,6 +15,7 @@ interface User {
   token?: string;
   role?: "Admin" | "Reviewer" | "MinistryUser";
   ministry?: { ministry_id: number; name: string } | null;
+  ministry_id: number;
 }
 
 interface AuthContextType {

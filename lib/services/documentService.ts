@@ -1,45 +1,46 @@
 "use server";
 // services/documentService.ts
 import { prisma } from "@/lib/prisma";
-import fs from "fs";
+import * as fs from "fs";
 import path from "path";
 import mammoth from "mammoth";
-import { AppUser, isAdmin, isMinistryUser } from "../auth";
-export async function createDocument(data: {
-  title: string;
-  type: "Report" | "Script";
-  file: File;
-  submitted_by?: number | null;
-  ministry_id?: number | null;
-}) {
+export async function createDocument(formData: FormData) {
   try {
-    if (!data.file) throw new Error("No file uploaded");
+    const title = formData.get("title") as string;
+    const type = formData.get("type") as "Report" | "Script";
+    const file = formData.get("file") as File;
+    const submitted_by = formData.get("submitted_by");
+    const ministry_id = formData.get("ministry_id");
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+    if (!file || !(file instanceof File)) {
+      throw new Error("No file uploaded");
+    }
 
-    const fileName = `${Date.now()}-${data.file.name}`;
+    const uploadDir = path.join(
+      process.cwd(),
+      "public",
+      "uploads",
+      "documents",
+    );
+
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const fileName = `${Date.now()}-${file.name}`;
     const filePath = path.join(uploadDir, fileName);
 
-    const buffer = Buffer.from(await data.file.arrayBuffer());
+    const buffer = Buffer.from(await file.arrayBuffer());
     fs.writeFileSync(filePath, buffer);
 
-    // Ensure ministry_id is a number
-    const ministryId = data.ministry_id ? Number(data.ministry_id) : null;
-
-    // Create document
     const newDoc = await prisma.document.create({
       data: {
-        title: data.title,
-        type: data.type,
-        file_path: `/uploads/${fileName}`,
+        title,
+        type,
         status: "Submitted",
-        submitted_by: data.submitted_by ?? null,
-        ministry_id: ministryId, // FIXED HERE
-      },
-      include: {
-        ministry: true,
-        submittedBy: true,
+        file_path: `/uploads/documents/${fileName}`,
+        submitted_by: submitted_by ? Number(submitted_by) : null,
+        ministry_id: ministry_id ? Number(ministry_id) : null,
       },
     });
 
@@ -47,17 +48,23 @@ export async function createDocument(data: {
       data: { document_id: newDoc.document_id },
     });
 
-    // --------------------------------------------------
-    // 2️⃣ EMIT SOCKET.IO NOTIFICATION
-    // --------------------------------------------------
-
+    // ✅ Return ONLY plain JSON
     return {
       success: true,
-      document: newDoc,
+      document: {
+        document_id: newDoc.document_id,
+        title: newDoc.title,
+        type: newDoc.type,
+        status: newDoc.status,
+        file_path: newDoc.file_path,
+      },
     };
   } catch (err: any) {
     console.error("❌ Document creation failed:", err);
-    return { success: false, error: err.message };
+    return {
+      success: false,
+      error: err.message,
+    };
   }
 }
 
@@ -68,9 +75,8 @@ export async function getDocumentById(id: number) {
       ministry: true,
       submittedBy: true,
       feedbacks: {
-        // include feedbacks
         include: {
-          reviewer: true, // optional: include reviewer info
+          reviewer: true,
         },
       },
     },
@@ -81,17 +87,22 @@ export async function getDocumentById(id: number) {
   const filePath = path.join(process.cwd(), "public", doc.file_path);
 
   let previewContent = "";
-  if (filePath.endsWith(".docx")) {
-    const result = await mammoth.convertToHtml({ path: filePath });
-    previewContent = result.value; // sanitized HTML
-  } else if (filePath.endsWith(".txt")) {
-    previewContent = fs.readFileSync(filePath, "utf-8");
+
+  // ✅ FIX: check file existence first
+  if (!fs.existsSync(filePath)) {
+    console.error("❌ File not found:", filePath);
+  } else {
+    if (filePath.endsWith(".docx")) {
+      const result = await mammoth.convertToHtml({ path: filePath });
+      previewContent = result.value;
+    } else if (filePath.endsWith(".txt")) {
+      previewContent = fs.readFileSync(filePath, "utf-8");
+    }
   }
 
   return {
     ...doc,
     previewContent,
-    // make sure nested objects exist to avoid undefined errors
     ministry: doc.ministry || null,
     submittedBy: doc.submittedBy || null,
     feedbacks: doc.feedbacks || [],
@@ -137,7 +148,7 @@ export async function updateDocument(
     ministry_id: number | null;
     feedbacks: Array<any>;
     status: "Submitted" | "Under_Review" | "Accepted" | "Denied" | "Revised";
-  }>
+  }>,
 ) {
   // Build an update payload that matches Prisma's update input shapes.
   const updateData: any = {};
@@ -176,7 +187,7 @@ export async function deleteDocument(document_id: number) {
 export async function changeDocumentStatus(
   document_id: number,
   status: "Submitted" | "Under_Review" | "Accepted" | "Denied" | "Revised",
-  reviewed_by?: number | null
+  reviewed_by?: number | null,
 ) {
   return prisma.document.update({
     where: { document_id },
@@ -208,7 +219,7 @@ export async function createRevision(
   revised_by: number,
   new_version_path?: string,
   old_version_path?: string,
-  notes?: string
+  notes?: string,
 ) {
   return prisma.revision.create({
     data: {
@@ -226,7 +237,7 @@ export async function createFeedback(
   document_id: number,
   reviewer_id: number,
   feedback_text: string,
-  action_required = false
+  action_required = false,
 ) {
   return prisma.feedback.create({
     data: {

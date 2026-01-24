@@ -88,15 +88,15 @@ export default function SubmissionList({ documents }: { documents: any[] }) {
                       {doc.type}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {doc.ministry?.map((min: any) => (
-                      <span key={min.id}>{min.name}</span>
-                    ))}
-                  </p>
+
                   <div className="flex gap-4 flex-wrap text-xs text-gray-500">
-                    <span>📅 {new Date(doc.reviewed_at).toLocaleString()}</span>
+                    <span>
+                      📅 {new Date(doc.submitted_at).toLocaleString()}
+                    </span>
                     {/* <span>👤 {doc.reviewer} </span> */}
-                    <span>Ministry of Health</span>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {doc.ministry.name}
+                    </p>
                   </div>
 
                   {doc.feedbacks && doc.feedbacks.length > 0 && (
@@ -118,7 +118,7 @@ export default function SubmissionList({ documents }: { documents: any[] }) {
               <div className="flex flex-col gap-2 sm:col-span-1 sm:items-end">
                 <span
                   className={`px-4 py-2 rounded-lg text-sm font-bold text-center sm:text-right ${getStatusBadge(
-                    doc.status
+                    doc.status,
                   )}`}
                 >
                   {doc.status === "Submitted"

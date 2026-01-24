@@ -38,11 +38,11 @@ export default function Navbar({
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo + Name */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg overflow-hidden shadow-lg">
+            <div className="flex items-center">
+              <div className="w-12.5 h-12.5 rounded-lg overflow-hidden shadow-lg">
                 <Link href="/">
                   <Image
-                    src="/somaliland-seal.png"
+                    src="/icon.png"
                     alt="Somaliland Seal"
                     width={40}
                     height={40}
@@ -55,7 +55,7 @@ export default function Navbar({
                   Jamhuuriyadda Somaliland
                 </h1>
                 <p className="text-sm font-semibold text-white/90">
-                 Nidaamka War-isgaadhsiinta Xukuumadda
+                  Nidaamka War-isgaadhsiinta Xukuumadda
                 </p>
               </div>
             </div>

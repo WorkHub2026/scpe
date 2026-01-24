@@ -1,108 +1,93 @@
 "use client";
+
 import { useAuth } from "@/context/AuthContext";
 import { createDocument } from "@/lib/services/documentService";
-import React, { useState, useRef } from "react";
 import FileDropZone from "./FileDropZone";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
 
 export default function UploadDocumentForm({
   setUploadDoc,
 }: {
   setUploadDoc: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  type UploadFormData = {
-    title: string;
-    type: "Report" | "Script";
-    file: File | null;
-  };
-
-  const [uploadFormData, setUploadFormData] = useState<UploadFormData>({
-    title: "",
-    type: "Report",
-    file: null,
-  });
-  const [error, setError] = useState("");
-
   const { user } = useAuth();
+  const [isPending, startTransition] = useTransition();
+  const [file, setFile] = useState<File | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!uploadFormData.file) {
-      setError("Please upload a valid file before submitting.");
+  const handleSubmit = (formData: FormData) => {
+    if (!file) {
+      toast.error("Please upload a document file");
       return;
     }
 
-    try {
-      await createDocument({
-        title: uploadFormData.title,
-        type: uploadFormData.type,
-        file: uploadFormData.file,
-        submitted_by: user?.user_id ?? null,
-        ministry_id: user?.ministry?.ministry_id ?? null,
-      });
+    // ✅ attach file manually
+    formData.set("file", file);
 
-      // Reset
-      setUploadFormData({ title: "", type: "Report", file: null });
-      setError("");
-    } catch (err) {
-      console.error("Error:", err);
-      setError("Failed to upload document. Please try again.");
-    }
+    startTransition(async () => {
+      const res: any = await createDocument(formData);
+
+      if (res?.success) {
+        toast.success("Document submitted successfully ✅");
+        setUploadDoc(false); // ✅ CLOSE MODAL
+        // refetch documents
+      } else {
+        toast.error(res?.message || "Failed to submit document");
+      }
+    });
   };
 
   return (
     <form
-      onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-xl shadow-md border border-[#004225]/30 space-y-4"
+      action={handleSubmit}
+      className="bg-white p-6 rounded-xl shadow-md border space-y-4"
     >
-      {/* Document Title */}
+      {/* TITLE */}
       <input
-        type="text"
+        name="title"
         placeholder="Document title"
-        value={uploadFormData.title}
-        onChange={(e) =>
-          setUploadFormData({ ...uploadFormData, title: e.target.value })
-        }
-        className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:ring-2 focus:ring-[#004225]/50"
+        required
+        className="w-full px-4 py-3 border rounded-lg"
       />
 
-      {/* Drag and Drop Zone */}
-
+      {/* FILE */}
       <FileDropZone
-        accept=".pdf,.doc,.docx,.txt"
-        onFileSelect={(file) => setUploadFormData({ ...uploadFormData, file })}
+        accept=".doc,.docx,.pdf,.txt"
+        onFileSelect={(file) => setFile(file)}
       />
-      {/* Preview */}
 
-      <select
-        value={uploadFormData.type}
-        onChange={(e) =>
-          setUploadFormData({
-            ...uploadFormData,
-            type: e.target.value as "Report" | "Script",
-          })
-        }
-        className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:ring-2 focus:ring-[#004225]/50"
-      >
+      {/* TYPE */}
+      <select name="type" className="w-full px-4 py-3 border rounded-lg">
         <option value="Report">Report</option>
         <option value="Script">Content (with review)</option>
       </select>
 
-      {/* Error Message */}
-      {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+      {/* SERVER ACTION SAFE VALUES */}
+      <input
+        type="hidden"
+        name="submitted_by"
+        value={String(user?.user_id ?? "")}
+      />
+      <input
+        type="hidden"
+        name="ministry_id"
+        value={String(user?.ministry_id ?? "")}
+      />
 
-      {/* Submit */}
-      <div className="flex items-center justify-between space-x-2">
+      {/* ACTIONS */}
+      <div className="flex gap-2">
         <button
           type="submit"
-          className="w-full py-3 bg-[#004225] text-white rounded-lg font-semibold hover:bg-[#00361d] transition-all"
+          disabled={isPending}
+          className="w-full py-3 bg-[#004225] text-white rounded-lg disabled:opacity-60"
         >
-          Submit
+          {isPending ? "Submitting..." : "Submit"}
         </button>
 
         <button
-          onClick={(prev) => setUploadDoc(!prev)}
-          className="w-full h-12 rounded-lg border border-[#004225] text-[#004225] font-semibold"
+          type="button"
+          onClick={() => setUploadDoc(false)}
+          className="w-full h-12 rounded-lg border text-[#004225]"
         >
           Cancel
         </button>

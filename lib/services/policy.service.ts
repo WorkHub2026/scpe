@@ -1,5 +1,5 @@
 "use server";
-import * as fs from "fs";
+import fs from "fs";
 import path from "path";
 import mammoth from "mammoth";
 
@@ -21,47 +21,42 @@ export const getAllPolicy = async () => {
   }
 };
 
-export const createPolicy = async (data: {
-  title: string;
-  file: File;
-  created_by: number;
-}) => {
+export async function createPolicyAction(formData: FormData) {
   try {
-    if (!data.file) throw new Error("No file uploaded");
+    const title = formData.get("title") as string;
+    const createdBy = Number(formData.get("created_by"));
+    const file = formData.get("file") as File | null;
 
-    // Ensure upload directory exists
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "policy");
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+    if (!file || !title) {
+      return { success: false, message: "Missing required fields" };
+    }
 
-    const fileName = `${Date.now()}-${data.file.name}`;
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "policies");
+
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const fileName = `${Date.now()}-${file.name}`;
     const filePath = path.join(uploadDir, fileName);
 
-    // Save file
-    const buffer = Buffer.from(await data.file.arrayBuffer());
     fs.writeFileSync(filePath, buffer);
 
-    // Save record
-    const resp = await prisma.policy.create({
+    const policy = await prisma.policy.create({
       data: {
-        title: data.title,
-        file_path: `/uploads/policy/${fileName}`, // ✅ FIXED
-        created_by: data.created_by,
+        title,
+        file_path: `/uploads/policies/${fileName}`,
+        created_by: createdBy,
       },
     });
 
-    return {
-      success: true,
-      message: "Created Successfully",
-      data: resp,
-    };
-  } catch (err: any) {
-    console.log("❌ Error at creating policy", err.message);
-    return {
-      success: false,
-      message: err.message,
-    };
+    return { success: true, policy };
+  } catch (error) {
+    console.error("❌ Create policy error:", error);
+    return { success: false, message: "Server error" };
   }
-};
+}
 
 export const deletePolicy = async (id: number) => {
   try {

@@ -97,7 +97,7 @@ const Announcements = () => {
         <h1 className="text-4xl text-slate-800 font-bold">FARRIIN</h1>
         <p className="flex items-center gap-1 text-gray-600">
           <Mail className="w-4 h-4" />
-          Send messages and announcements to all ministry users
+       Farriin ama wargelin u dir hay’adaha oo dhan
         </p>
       </div>
 
