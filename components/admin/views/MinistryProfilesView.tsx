@@ -79,7 +79,7 @@ export default function MinistryProfilesView() {
           </h2>
           <p className="text-gray-600 mt-3 flex items-center gap-2">
             <FileText className="w-4 h-4 text-[#004225]" />
-            Centralized ministry information
+            Xogta hay’adda
           </p>
         </div>
         <button

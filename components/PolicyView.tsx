@@ -46,7 +46,7 @@ const PolicyView = () => {
         </h2>
         <p className="text-gray-600 mt-3 flex items-center gap-2">
           <FileCode className="w-4 h-4 text-[#004225]" />
-          Upload and manage organizational policies
+          Lifaaqidda iyo maaraynta siyaasadaha
         </p>
       </div>
 

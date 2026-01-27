@@ -45,7 +45,7 @@ export default function DashboardView({
         </h2>
         <p className="text-gray-600 mt-3 flex items-center gap-2">
           <Zap className="w-4 h-4 text-[#004225]" />
-          Centralized review of all ministry submissions
+          dib-u-eegista war-isgaadhsiinta
         </p>
       </div>
 

@@ -79,7 +79,7 @@ export default function Sidebar<T extends string>({
     },
     {
       id: "digital-assets",
-      label: "Bookho Bogga Astaamaha xukumadaha",
+      label: "Sumadda xukuumadda",
       icon: Zap,
       roles: ["Admin", "MinistryUser"],
     },

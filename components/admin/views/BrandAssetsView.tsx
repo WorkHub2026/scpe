@@ -11,7 +11,7 @@ export default function BrandAssetsView() {
         </h2>
         <p className="text-gray-600 flex items-center gap-2">
           <Package className="w-4 h-4 text-[#004225]" />
-          Manage and access brand resources
+          Maaraynta iyo helitaanka tixraaca summadaha
         </p>
       </div>
 
