@@ -44,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`font-sans antialiased bg-gray-100  ${lato.variable} font-lato`}
+        className={`${lato.variable} font-sans antialiased bg-gray-100`}
       >
         <AuthProvider>{children}</AuthProvider>
 
