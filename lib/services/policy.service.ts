@@ -4,6 +4,7 @@ import path from "path";
 import mammoth from "mammoth";
 
 import { prisma } from "../prisma";
+import { supabaseAdmin } from "../supabase/server";
 
 export const getAllPolicy = async () => {
   try {
@@ -20,7 +21,6 @@ export const getAllPolicy = async () => {
     };
   }
 };
-
 export async function createPolicyAction(formData: FormData) {
   try {
     const title = formData.get("title") as string;
@@ -31,22 +31,35 @@ export async function createPolicyAction(formData: FormData) {
       return { success: false, message: "Missing required fields" };
     }
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "policies");
+    // Generate unique file name
+    const timestamp = Date.now();
+    const fileName = `${timestamp}-${file.name}`;
 
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    // Upload file to Supabase bucket
+    const { data, error: uploadError } = await supabaseAdmin.storage
+      .from("policies") // your bucket name
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (uploadError || !data) {
+      console.error("❌ Supabase upload error:", uploadError);
+      return { success: false, message: "Failed to upload file" };
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const fileName = `${Date.now()}-${file.name}`;
-    const filePath = path.join(uploadDir, fileName);
+    // Get public URL
+    const { data: publicUrlData } = supabaseAdmin.storage
+      .from("policies")
+      .getPublicUrl(fileName);
 
-    fs.writeFileSync(filePath, buffer);
+    const filePath = publicUrlData.publicUrl;
 
+    // Save policy record in database
     const policy = await prisma.policy.create({
       data: {
         title,
-        file_path: `/uploads/policies/${fileName}`,
+        file_path: filePath,
         created_by: createdBy,
       },
     });
@@ -93,23 +106,20 @@ export async function getPolicyById(id: number) {
 
   if (!policy) return null;
 
-  // ✅ FIX: avoid path duplication
-  const filePath = path.join(process.cwd(), "public", policy.file_path);
-
-  // ✅ SAFETY CHECK (prevents ENOENT)
-  try {
-    await fs.promises.access(filePath);
-  } catch {
-    throw new Error(`File not found: ${filePath}`);
-  }
-
   let previewContent = "";
+  if (policy.file_path.toLowerCase().endsWith(".docx")) {
+    try {
+      const res = await fetch(policy.file_path);
+      if (!res.ok) throw new Error("Fetch failed");
+      const arrayBuffer = await res.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
 
-  if (filePath.endsWith(".docx")) {
-    const result = await mammoth.convertToHtml({ path: filePath });
-    previewContent = result.value;
-  } else if (filePath.endsWith(".txt")) {
-    previewContent = await fs.promises.readFile(filePath, "utf-8");
+      const result = await mammoth.convertToHtml({ buffer });
+      previewContent = result.value;
+    } catch (err) {
+      console.error("⚠️ DOCX preview failed:", err);
+      previewContent = "";
+    }
   }
 
   return {

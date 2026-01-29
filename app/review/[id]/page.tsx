@@ -89,12 +89,13 @@ const ReviewPage = () => {
 
           {/* Preview & editable content */}
           <div className="border border-gray-300 rounded p-4 max-h-[500px] overflow-auto">
-            {data.file_path.endsWith(".pdf") ? (
-              <iframe
-                src={data.file_path}
-                width="100%"
-                height="500px"
-                className="border-none"
+            {data.file_path.endsWith(".docx") ? (
+              <div
+                ref={previewRef}
+                className="prose max-w-full border p-2 rounded"
+                dangerouslySetInnerHTML={{
+                  __html: data.previewContent || "<p>No preview available</p>",
+                }}
               />
             ) : (
               <div
