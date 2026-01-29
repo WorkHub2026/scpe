@@ -7,6 +7,11 @@ export async function createMinistry(data: {
   description?: string;
   contact_email?: string;
   contact_phone?: string;
+  facebook_url?: string;
+  twitter_url?: string;
+  instagram_url?: string;
+  linkedin_url?: string;
+  youtube_url?: string;
 }) {
   return prisma.ministry.create({
     data,
@@ -39,6 +44,11 @@ export async function updateMinistry(
     description: string | null;
     contact_email: string | null;
     contact_phone: string | null;
+    facebook_url: string | null;
+    twitter_url: string | null;
+    instagram_url: string | null;
+    linkedin_url: string | null;
+    youtube_url: string | null;
   }>
 ) {
   return prisma.ministry.update({

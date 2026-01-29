@@ -27,6 +27,11 @@ export default function MinistryProfilesView() {
     description: "",
     contact_email: "",
     contact_phone: "",
+    facebook_url: "",
+    twitter_url: "",
+    instagram_url: "",
+    linkedin_url: "",
+    youtube_url: "",
   });
 
   const handleEditMinistry = (ministry: any) => {
@@ -42,6 +47,11 @@ export default function MinistryProfilesView() {
       description: "",
       contact_email: "",
       contact_phone: "",
+      facebook_url: "",
+      twitter_url: "",
+      instagram_url: "",
+      linkedin_url: "",
+      youtube_url: "",
     });
     setSelectedMinistry({
       id: Math.max(...ministries.map((m: any) => m.id), 0) + 1,
@@ -52,21 +62,37 @@ export default function MinistryProfilesView() {
 
   const handleSaveNewMinistry = async () => {
     try {
-      setFormData({
-        name: "",
-        description: "",
-        contact_email: "",
-        contact_phone: "",
-      });
       const newMinistry = {
         name: formData.name,
         contact_email: formData.contact_email,
         description: formData.description,
         contact_phone: formData.contact_phone,
+        facebook_url: formData.facebook_url || undefined,
+        twitter_url: formData.twitter_url || undefined,
+        instagram_url: formData.instagram_url || undefined,
+        linkedin_url: formData.linkedin_url || undefined,
+        youtube_url: formData.youtube_url || undefined,
       };
       await createMinistry(newMinistry);
+      setFormData({
+        name: "",
+        description: "",
+        contact_email: "",
+        contact_phone: "",
+        facebook_url: "",
+        twitter_url: "",
+        instagram_url: "",
+        linkedin_url: "",
+        youtube_url: "",
+      });
+      setIsEditing(false);
+      setIsAddingNew(false);
+      setSelectedMinistry(null);
+      // Refresh ministries list
+      const resp: any = await listMinistries();
+      setMinistries(resp);
     } catch (error) {
-      console.log("Error at creating a ministry");
+      console.log("Error at creating a ministry", error);
     }
   };
 
@@ -180,6 +206,70 @@ export default function MinistryProfilesView() {
                     />
                   </div>
 
+                  <div className="space-y-4 pt-5 border-t border-[#004225]/30">
+                    <p className="font-bold text-gray-900">Social Media Accounts</p>
+                    <input
+                      type="url"
+                      placeholder="Facebook URL"
+                      value={formData.facebook_url}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          facebook_url: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white/50"
+                    />
+                    <input
+                      type="url"
+                      placeholder="Twitter/X URL"
+                      value={formData.twitter_url}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          twitter_url: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white/50"
+                    />
+                    <input
+                      type="url"
+                      placeholder="Instagram URL"
+                      value={formData.instagram_url}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          instagram_url: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white/50"
+                    />
+                    <input
+                      type="url"
+                      placeholder="LinkedIn URL"
+                      value={formData.linkedin_url}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          linkedin_url: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white/50"
+                    />
+                    <input
+                      type="url"
+                      placeholder="YouTube URL"
+                      value={formData.youtube_url}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          youtube_url: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white/50"
+                    />
+                  </div>
+
                   <div className="flex gap-4 pt-5">
                     <button
                       onClick={handleSaveNewMinistry}
@@ -228,6 +318,40 @@ export default function MinistryProfilesView() {
                       </p>
                     </div>
                   </div>
+                  {(selectedMinistry.facebook_url || selectedMinistry.twitter_url || selectedMinistry.instagram_url || selectedMinistry.linkedin_url || selectedMinistry.youtube_url) && (
+                    <div className="pt-6 border-t border-[#004225]/30">
+                      <p className="text-xs font-bold text-gray-600 uppercase mb-4">
+                        Social Media Accounts
+                      </p>
+                      <div className="space-y-3">
+                        {selectedMinistry.facebook_url && (
+                          <a href={selectedMinistry.facebook_url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 p-3 bg-blue-50 rounded-lg border border-blue-200 block">
+                            <strong>Facebook:</strong> {selectedMinistry.facebook_url}
+                          </a>
+                        )}
+                        {selectedMinistry.twitter_url && (
+                          <a href={selectedMinistry.twitter_url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-400 hover:text-blue-600 p-3 bg-blue-50 rounded-lg border border-blue-200 block">
+                            <strong>Twitter/X:</strong> {selectedMinistry.twitter_url}
+                          </a>
+                        )}
+                        {selectedMinistry.instagram_url && (
+                          <a href={selectedMinistry.instagram_url} target="_blank" rel="noopener noreferrer" className="text-sm text-pink-600 hover:text-pink-800 p-3 bg-pink-50 rounded-lg border border-pink-200 block">
+                            <strong>Instagram:</strong> {selectedMinistry.instagram_url}
+                          </a>
+                        )}
+                        {selectedMinistry.linkedin_url && (
+                          <a href={selectedMinistry.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-700 hover:text-blue-900 p-3 bg-blue-50 rounded-lg border border-blue-200 block">
+                            <strong>LinkedIn:</strong> {selectedMinistry.linkedin_url}
+                          </a>
+                        )}
+                        {selectedMinistry.youtube_url && (
+                          <a href={selectedMinistry.youtube_url} target="_blank" rel="noopener noreferrer" className="text-sm text-red-600 hover:text-red-800 p-3 bg-red-50 rounded-lg border border-red-200 block">
+                            <strong>YouTube:</strong> {selectedMinistry.youtube_url}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

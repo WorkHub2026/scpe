@@ -115,17 +115,45 @@ export async function listDocuments({
   ministry_id,
   status,
   submitted_by,
+  search,
+  startDate,
+  endDate,
 }: {
   skip?: number;
   take?: number;
   ministry_id?: number;
   status?: string;
   submitted_by?: number;
+  search?: string;
+  startDate?: Date;
+  endDate?: Date;
 } = {}) {
   const where: any = {};
   if (ministry_id) where.ministry_id = ministry_id;
   if (status) where.status = status;
   if (submitted_by) where.submitted_by = submitted_by;
+  
+  // Date filtering
+  if (startDate || endDate) {
+    where.submitted_at = {};
+    if (startDate) {
+      where.submitted_at.gte = startDate;
+    }
+    if (endDate) {
+      // Set endDate to end of day
+      const endOfDay = new Date(endDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      where.submitted_at.lte = endOfDay;
+    }
+  }
+  
+  // Search filtering (by title or ministry name)
+  if (search) {
+    where.OR = [
+      { title: { contains: search, mode: "insensitive" } },
+      { ministry: { name: { contains: search, mode: "insensitive" } } },
+    ];
+  }
 
   return prisma.document.findMany({
     where,
@@ -137,6 +165,48 @@ export async function listDocuments({
       feedbacks: true,
     },
   });
+}
+
+// Get document counts by ministry for a specific time period
+export async function getDocumentCountsByMinistry({
+  startDate,
+  endDate,
+}: {
+  startDate?: Date;
+  endDate?: Date;
+} = {}) {
+  const where: any = {};
+  
+  if (startDate || endDate) {
+    where.submitted_at = {};
+    if (startDate) {
+      where.submitted_at.gte = startDate;
+    }
+    if (endDate) {
+      const endOfDay = new Date(endDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      where.submitted_at.lte = endOfDay;
+    }
+  }
+
+  const documents = await prisma.document.findMany({
+    where,
+    include: {
+      ministry: true,
+    },
+  });
+
+  // Group by ministry and count
+  const counts: Record<string, number> = {};
+  documents.forEach((doc) => {
+    const ministryName = doc.ministry?.name || "Unknown";
+    counts[ministryName] = (counts[ministryName] || 0) + 1;
+  });
+
+  return Object.entries(counts).map(([name, count]) => ({
+    ministry: name,
+    count,
+  }));
 }
 
 export async function updateDocument(

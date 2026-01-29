@@ -6,6 +6,7 @@ import StatsOverview from "@/components/StatsOverView";
 import Tabs from "@/components/Tabs";
 import SubmissionList from "@/components/SubmissionList";
 import MinistryOverview from "@/components/MinistryOverview";
+import DocumentFilterView from "./DocumentFilterView";
 import { listDocuments } from "@/lib/services/documentService";
 import { useAuth } from "@/context/AuthContext";
 
@@ -36,6 +37,10 @@ export default function DashboardView({
     loadDocuments();
   }, []);
 
+  const handleFilterChange = (filteredDocuments: any[]) => {
+    setDocuments(filteredDocuments);
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -54,6 +59,11 @@ export default function DashboardView({
 
       {/* Tabs */}
       <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+
+      {/* Filter Section - Only show for submissions tab */}
+      {selectedTab === "submissions" && (
+        <DocumentFilterView onFilterChange={handleFilterChange} />
+      )}
 
       {/* Tab Content */}
       {loading ? (

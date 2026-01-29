@@ -50,7 +50,7 @@ export default function RequestsTable({ requests }: { requests: any[] }) {
               <th className="p-3 text-left">Dhambaal</th>
               <th className="p-3 text-left">Xaalad</th>
               <th className="p-3 text-left">Codsi</th>
-              <th className="p-3 text-right">Tallaabo </th>
+              <th className="p-3 text-right">ogalanshiyo </th>
             </tr>
           </thead>
 

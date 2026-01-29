@@ -1,16 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DecisionModal from "@/components/DecisionModal";
-import { AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, Search, Calendar } from "lucide-react";
 import {
   changeDocumentStatus,
   createFeedback,
+  listDocuments,
 } from "@/lib/services/documentService";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
-export default function SubmissionList({ documents }: { documents: any[] }) {
+export default function SubmissionList({ documents: initialDocuments }: { documents: any[] }) {
+  const [documents, setDocuments] = useState(initialDocuments);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchDate, setSearchDate] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setDocuments(initialDocuments);
+  }, [initialDocuments]);
+
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      let startDate: Date | undefined;
+      let endDate: Date | undefined;
+
+      if (searchDate) {
+        const date = new Date(searchDate);
+        startDate = new Date(date.setHours(0, 0, 0, 0));
+        endDate = new Date(date.setHours(23, 59, 59, 999));
+      }
+
+      const results = await listDocuments({
+        search: searchQuery || undefined,
+        startDate,
+        endDate,
+      });
+      setDocuments(results);
+    } catch (error) {
+      console.error("Search failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearSearch = async () => {
+    setSearchQuery("");
+    setSearchDate("");
+    try {
+      const results = await listDocuments();
+      setDocuments(results);
+    } catch (error) {
+      console.error("Failed to load documents:", error);
+    }
+  };
   type DocumentStatus =
     | "Submitted"
     | "Under_Review"
@@ -65,6 +110,50 @@ export default function SubmissionList({ documents }: { documents: any[] }) {
 
   return (
     <div className="space-y-4">
+      {/* Search Section */}
+      <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-[#004225]/30">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search by document name or ministry..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+              className="w-full pl-10 pr-4 py-2 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white"
+            />
+          </div>
+          <div className="relative flex-1 sm:flex-initial sm:w-48">
+            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="date"
+              value={searchDate}
+              onChange={(e) => setSearchDate(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSearch}
+              disabled={loading}
+              className="px-4 py-2 bg-[#004225] hover:bg-[#003218] text-white rounded-lg font-bold transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
+            >
+              <Search className="w-4 h-4" />
+              {loading ? "..." : "Search"}
+            </button>
+            {(searchQuery || searchDate) && (
+              <button
+                onClick={clearSearch}
+                className="px-4 py-2 border border-[#004225]/30 text-gray-700 rounded-lg font-bold hover:bg-gray-50 transition-all duration-300"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
       {documents.length === 0 ? (
         <p className="text-gray-600">No documents found.</p>
       ) : (
@@ -95,7 +184,7 @@ export default function SubmissionList({ documents }: { documents: any[] }) {
                     </span>
                     {/* <span>👤 {doc.reviewer} </span> */}
                     <p className="text-sm text-gray-600 mb-2">
-                      {doc.ministry.name}
+                      {doc.ministry?.name || "Unknown Ministry"}
                     </p>
                   </div>
 

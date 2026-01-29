@@ -1,9 +1,56 @@
 "use client";
 
-import { CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { CheckCircle, Clock, AlertCircle, Search, Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
-export default function ListDocuments({ documents }: { documents: any[] }) {
+import { listDocuments } from "@/lib/services/documentService";
+
+export default function ListDocuments({ documents: initialDocuments }: { documents: any[] }) {
   const router = useRouter();
+  const [documents, setDocuments] = useState(initialDocuments);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchDate, setSearchDate] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setDocuments(initialDocuments);
+  }, [initialDocuments]);
+
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      let startDate: Date | undefined;
+      let endDate: Date | undefined;
+
+      if (searchDate) {
+        const date = new Date(searchDate);
+        startDate = new Date(date.setHours(0, 0, 0, 0));
+        endDate = new Date(date.setHours(23, 59, 59, 999));
+      }
+
+      const results = await listDocuments({
+        search: searchQuery || undefined,
+        startDate,
+        endDate,
+      });
+      setDocuments(results);
+    } catch (error) {
+      console.error("Search failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearSearch = async () => {
+    setSearchQuery("");
+    setSearchDate("");
+    try {
+      const results = await listDocuments();
+      setDocuments(results);
+    } catch (error) {
+      console.error("Failed to load documents:", error);
+    }
+  };
   const getStatusBadge = (status: string) => {
     const styles = {
       Accepted:
@@ -33,9 +80,54 @@ export default function ListDocuments({ documents }: { documents: any[] }) {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-2xl font-bold text-gray-900 mb-6">
-        Waraaqahaga(Documents)
-      </h3>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h3 className="text-2xl font-bold text-gray-900">
+          Waraaqahaga(Documents)
+        </h3>
+        
+        {/* Search Section */}
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-initial">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search by name or ministry..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+              className="w-full sm:w-64 pl-10 pr-4 py-2 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white"
+            />
+          </div>
+          <div className="relative flex-1 sm:flex-initial">
+            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="date"
+              value={searchDate}
+              onChange={(e) => setSearchDate(e.target.value)}
+              className="w-full sm:w-48 pl-10 pr-4 py-2 border border-[#004225]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004225]/50 bg-white"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSearch}
+              disabled={loading}
+              className="px-4 py-2 bg-[#004225] hover:bg-[#003218] text-white rounded-lg font-bold transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
+            >
+              <Search className="w-4 h-4" />
+              {loading ? "..." : "Search"}
+            </button>
+            {(searchQuery || searchDate) && (
+              <button
+                onClick={clearSearch}
+                className="px-4 py-2 border border-[#004225]/30 text-gray-700 rounded-lg font-bold hover:bg-gray-50 transition-all duration-300"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+      
       {documents.length > 0 ? (
         documents.map((doc, index) => (
           <div
@@ -58,7 +150,7 @@ export default function ListDocuments({ documents }: { documents: any[] }) {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">
-                    {doc.ministry.name}
+                    {doc.ministry?.name || "Unknown Ministry"}
                   </p>
                   <div className="flex gap-4 flex-wrap text-xs text-gray-500">
                     <span>
