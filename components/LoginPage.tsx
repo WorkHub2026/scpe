@@ -53,11 +53,11 @@ export default function LoginPage() {
       }
 
       // Store user in AuthProvider / localStorage
-      login(user);
+      login({ ...(user as any), token });
     } catch (err: any) {
       console.error(err);
 
-      setError("Network error");
+      setError(err?.message || "Network error");
     } finally {
       setIsLoading(false);
     }

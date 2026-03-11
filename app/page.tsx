@@ -5,6 +5,7 @@ import AdminDashboard from "@/components/admin/AdminDashboard";
 import MinistryDashboard from "@/components/admin/MinistryDashboard";
 import LoginPage from "@/components/LoginPage";
 import UnAuthorized from "@/components/UnAuthorized";
+import ChangePasswordPage from "@/components/ChangePasswordPage";
 
 export default function Home() {
   const { user, logout, loading } = useAuth();
@@ -19,6 +20,10 @@ export default function Home() {
 
   if (!user) {
     return <LoginPage />;
+  }
+
+  if ((user as any).must_change_password) {
+    return <ChangePasswordPage />;
   }
 
   if (user.role === "Admin") {

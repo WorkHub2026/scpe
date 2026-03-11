@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { LogOut, User } from "lucide-react";
+import { KeyRound, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import NotificationBell from "../NotificationBell";
 export default function Navbar({
@@ -100,7 +100,14 @@ export default function Navbar({
                       )}
                     </div>
 
-                    {/* Request Password Change: Only Ministry Users */}
+                    <Link
+                      href="/change-password"
+                      onClick={() => setOpen(false)}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-white/90 hover:bg-white/10 transition"
+                    >
+                      <KeyRound className="w-4 h-4" />
+                      Change password
+                    </Link>
 
                     {/* Logout */}
                     <button

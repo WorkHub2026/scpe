@@ -29,6 +29,8 @@ model User {
   username      String    @unique
   email         String
   password_hash String
+  must_change_password Boolean @default(false)
+  temp_password_expires DateTime?
   role          Role
   status        Boolean   @default(true)
   created_at    DateTime  @default(now())

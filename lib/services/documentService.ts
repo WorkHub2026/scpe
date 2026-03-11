@@ -1,54 +1,84 @@
 "use server";
-// services/documentService.ts
+
 import { prisma } from "@/lib/prisma";
-import * as fs from "fs";
-import path from "path";
+import { supabaseAdmin } from "@/lib/supabase/server";
 import mammoth from "mammoth";
+
 export async function createDocument(formData: FormData) {
   try {
-    const title = formData.get("title") as string;
-    const type = formData.get("type") as "Report" | "Script";
-    const file = formData.get("file") as File;
-    const submitted_by = formData.get("submitted_by");
-    const ministry_id = formData.get("ministry_id");
+    // --------------------------------------------------
+    // 1️⃣ Extract & validate input
+    // --------------------------------------------------
+    const title = formData.get("title");
+    const type = formData.get("type");
+    const file = formData.get("file");
+    const submittedBy = formData.get("submitted_by");
+    const ministryId = formData.get("ministry_id");
 
-    if (!file || !(file instanceof File)) {
-      throw new Error("No file uploaded");
+    if (typeof title !== "string" || !title.trim()) {
+      throw new Error("Title is required");
     }
 
-    const uploadDir = path.join(
-      process.cwd(),
-      "public",
-      "uploads",
-      "documents",
-    );
-
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    if (type !== "Report" && type !== "Script") {
+      throw new Error("Invalid document type");
     }
 
-    const fileName = `${Date.now()}-${file.name}`;
-    const filePath = path.join(uploadDir, fileName);
+    if (!(file instanceof File)) {
+      throw new Error("File is required");
+    }
+
+    // --------------------------------------------------
+    // 2️⃣ Upload file to Supabase Storage
+    // --------------------------------------------------
+    const extension = file.name.split(".").pop();
+    const storagePath = `documents/${Date.now()}-${crypto.randomUUID()}.${extension}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    fs.writeFileSync(filePath, buffer);
 
-    const newDoc = await prisma.document.create({
-      data: {
-        title,
-        type,
-        status: "Submitted",
-        file_path: `/uploads/documents/${fileName}`,
-        submitted_by: submitted_by ? Number(submitted_by) : null,
-        ministry_id: ministry_id ? Number(ministry_id) : null,
-      },
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from("documents")
+      .upload(storagePath, buffer, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: publicUrlData } = supabaseAdmin.storage
+      .from("documents")
+      .getPublicUrl(storagePath);
+
+    if (!publicUrlData?.publicUrl) {
+      throw new Error("Failed to generate public URL");
+    }
+
+    // --------------------------------------------------
+    // 3️⃣ Create DB records (transaction)
+    // --------------------------------------------------
+    const newDoc = await prisma.$transaction(async (tx) => {
+      const document = await tx.document.create({
+        data: {
+          title: title.trim(),
+          type,
+          status: "Submitted",
+          file_path: publicUrlData.publicUrl,
+          submitted_by: submittedBy ? Number(submittedBy) : null,
+          ministry_id: ministryId ? Number(ministryId) : null,
+        },
+      });
+
+      await tx.chatThread.create({
+        data: {
+          document_id: document.document_id,
+        },
+      });
+
+      return document;
     });
 
-    await prisma.chatThread.create({
-      data: { document_id: newDoc.document_id },
-    });
-
-    // ✅ Return ONLY plain JSON
+    // --------------------------------------------------
+    // 4️⃣ Return safe response
+    // --------------------------------------------------
     return {
       success: true,
       document: {
@@ -59,16 +89,21 @@ export async function createDocument(formData: FormData) {
         file_path: newDoc.file_path,
       },
     };
-  } catch (err: any) {
-    console.error("❌ Document creation failed:", err);
+  } catch (error: any) {
+    console.error("❌ createDocument failed:", error);
     return {
       success: false,
-      error: err.message,
+      error: error.message ?? "Failed to create document",
     };
   }
 }
 
 export async function getDocumentById(id: number) {
+  if (!id || Number.isNaN(id)) return null;
+
+  // --------------------------------------------------
+  // 1️⃣ Fetch document + relations
+  // --------------------------------------------------
   const doc = await prisma.document.findUnique({
     where: { document_id: id },
     include: {
@@ -84,28 +119,43 @@ export async function getDocumentById(id: number) {
 
   if (!doc) return null;
 
-  const filePath = path.join(process.cwd(), "public", doc.file_path);
-
+  // --------------------------------------------------
+  // 2️⃣ Generate preview (best-effort)
+  // --------------------------------------------------
   let previewContent = "";
 
-  // ✅ FIX: check file existence first
-  if (!fs.existsSync(filePath)) {
-    console.error("❌ File not found:", filePath);
-  } else {
-    if (filePath.endsWith(".docx")) {
-      const result = await mammoth.convertToHtml({ path: filePath });
+  if (doc.file_path?.toLowerCase().endsWith(".docx")) {
+    try {
+      const res = await fetch(doc.file_path);
+      if (!res.ok) throw new Error("Fetch failed");
+
+      const arrayBuffer = await res.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      const result = await mammoth.convertToHtml({ buffer });
       previewContent = result.value;
-    } else if (filePath.endsWith(".txt")) {
-      previewContent = fs.readFileSync(filePath, "utf-8");
+    } catch (err) {
+      console.error("⚠️ DOCX preview failed:", err);
+      previewContent = "";
     }
   }
 
+  // --------------------------------------------------
+  // 3️⃣ Normalized response
+  // --------------------------------------------------
   return {
-    ...doc,
+    document_id: doc.document_id,
+    title: doc.title,
+    type: doc.type,
+    status: doc.status,
+    file_path: doc.file_path,
+    submitted_at: doc.submitted_at,
+
+    ministry: doc.ministry ?? null,
+    submittedBy: doc.submittedBy ?? null,
+    feedbacks: doc.feedbacks ?? [],
+
     previewContent,
-    ministry: doc.ministry || null,
-    submittedBy: doc.submittedBy || null,
-    feedbacks: doc.feedbacks || [],
   };
 }
 
@@ -132,7 +182,7 @@ export async function listDocuments({
   if (ministry_id) where.ministry_id = ministry_id;
   if (status) where.status = status;
   if (submitted_by) where.submitted_by = submitted_by;
-  
+
   // Date filtering
   if (startDate || endDate) {
     where.submitted_at = {};
@@ -146,7 +196,7 @@ export async function listDocuments({
       where.submitted_at.lte = endOfDay;
     }
   }
-  
+
   // Search filtering (by title or ministry name)
   if (search) {
     where.OR = [
@@ -176,7 +226,7 @@ export async function getDocumentCountsByMinistry({
   endDate?: Date;
 } = {}) {
   const where: any = {};
-  
+
   if (startDate || endDate) {
     where.submitted_at = {};
     if (startDate) {

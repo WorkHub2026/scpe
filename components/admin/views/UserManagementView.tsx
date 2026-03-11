@@ -18,6 +18,7 @@ interface UserForm {
   email: string;
   password: string;
   role: string;
+  must_change_password: boolean;
 }
 
 export default function UserManagementView() {
@@ -66,6 +67,7 @@ export default function UserManagementView() {
     email: "",
     password: "",
     role: "",
+    must_change_password: true,
   });
 
   const handleAddUser = async () => {
@@ -77,6 +79,7 @@ export default function UserManagementView() {
         password: formData.password,
         role: formData.role as "Admin" | "MinistryUser",
         ministry_id: formData.ministry_id ? Number(formData.ministry_id) : null, // convert safely
+        must_change_password: formData.must_change_password,
       };
 
       await createUser(newUser);
@@ -88,6 +91,7 @@ export default function UserManagementView() {
         email: "",
         role: "",
         password: "",
+        must_change_password: true,
       });
 
       setIsAddingUser(false);
@@ -137,6 +141,7 @@ export default function UserManagementView() {
                   email: "",
                   role: "",
                   password: "",
+                  must_change_password: true,
                 });
                 setEditingId(null);
               }}
@@ -206,6 +211,21 @@ export default function UserManagementView() {
               <option value="MinistryUser">Ministry User</option>
             </select>
           </div>
+
+          <label className="flex items-center gap-3 text-sm font-semibold text-gray-700 mb-6">
+            <input
+              type="checkbox"
+              checked={formData.must_change_password}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  must_change_password: e.target.checked,
+                })
+              }
+              className="h-4 w-4 accent-[#004225]"
+            />
+            Require password change on first login
+          </label>
 
           <div className="flex gap-4">
             <button

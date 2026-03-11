@@ -15,8 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   getUserById,
-  resetPasswordByUsername,
-  updateUser,
+  adminSetTemporaryPassword,
 } from "@/lib/services/userService";
 import { toast } from "sonner";
 export function EditUserModal({
@@ -28,6 +27,7 @@ export function EditUserModal({
 }) {
   const [user, setUser] = useState<any>(null);
   const [newPassword, setNewPassword] = useState("");
+  const [expiresInHours, setExpiresInHours] = useState(24);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -43,27 +43,42 @@ export function EditUserModal({
     };
     fetchingUser();
   }, []);
+  const generateTempPassword = () => {
+    const alphabet =
+      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$";
+    const bytes = new Uint8Array(12);
+    window.crypto.getRandomValues(bytes);
+    const pw = Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
+    setNewPassword(pw);
+  };
+
   const handleEditUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await resetPasswordByUsername(user.user_id, newPassword);
+      await adminSetTemporaryPassword({
+        user_id: user.user_id,
+        temporaryPassword: newPassword,
+        expiresInHours,
+      });
       setLoading(false);
       onClose();
-      toast.success("User updated successfully ✅");
+      toast.success("Temporary password set ✅");
     } catch (error) {
       console.log("Error at updating a user:", error);
+      toast.error("Failed to set temporary password");
     }
   };
   return (
-    <form onClick={handleEditUser}>
+    <form onSubmit={handleEditUser}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
             {user ? `Edit User: ${user.username}` : "Edit User"}
           </DialogTitle>
           <DialogDescription>
-            Make changes to your profile here. Click save when you&apos;re done.
+            Set a temporary password. The user will be forced to change it on
+            next login.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
@@ -77,13 +92,29 @@ export function EditUserModal({
             />
           </div>
           <div className="grid gap-3">
-            <Label htmlFor="name-1">New Password</Label>
+            <Label htmlFor="name-1">Temporary Password</Label>
             <Input
               name="password"
               type="password"
               value={newPassword}
               placeholder="Enter a new password here"
               onChange={(e) => setNewPassword(e.target.value)}
+            />
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={generateTempPassword}>
+                Generate
+              </Button>
+            </div>
+          </div>
+          <div className="grid gap-3">
+            <Label htmlFor="expires">Expires (hours)</Label>
+            <Input
+              id="expires"
+              name="expires"
+              type="number"
+              min={1}
+              value={expiresInHours}
+              onChange={(e) => setExpiresInHours(Number(e.target.value))}
             />
           </div>
         </div>

@@ -16,6 +16,8 @@ interface User {
   role?: "Admin" | "Reviewer" | "MinistryUser";
   ministry?: { ministry_id: number; name: string } | null;
   ministry_id: number;
+  must_change_password?: boolean;
+  temp_password_expires?: string | null;
 }
 
 interface AuthContextType {

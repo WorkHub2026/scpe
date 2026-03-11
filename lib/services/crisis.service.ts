@@ -1,9 +1,7 @@
 "use server";
-
-import { promises as fs } from "fs";
-import path from "path";
 import mammoth from "mammoth";
 import { prisma } from "../prisma";
+import { supabaseAdmin } from "@/lib/supabase/server";
 export const getAllCrisis = async () => {
   try {
     const resp: any = await prisma.crisis.findMany();
@@ -20,47 +18,93 @@ export const getAllCrisis = async () => {
 
 export const createCrisis = async (formData: FormData) => {
   try {
-    const data = {
-      title: formData.get("title") as string,
-      file: formData.get("file") as File,
-      created_by: Number(formData.get("created_by")),
-      priority: formData.get("priority") as "LOW" | "MEDIUM" | "HIGH",
-    };
+    // --------------------------------------------------
+    // 1️⃣ Extract & validate form data
+    // --------------------------------------------------
+    const title = formData.get("title");
+    const file = formData.get("file");
+    const created_by = formData.get("created_by");
+    const priority = formData.get("priority");
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "crisis");
+    if (!title || typeof title !== "string") {
+      throw new Error("Title is required");
+    }
 
-    // Ensure /uploads/crisis folder exists
-    await fs.mkdir(uploadDir, { recursive: true });
+    if (!file || !(file instanceof File)) {
+      throw new Error("File is required");
+    }
 
-    // ✅ SANITIZE filename (FIX)
-    const safeName = data.file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const fileName = `${Date.now()}-${safeName}`;
+    if (!created_by) {
+      throw new Error("Created_by is required");
+    }
 
-    const filePath = path.join(uploadDir, fileName);
+    if (!["LOW", "MEDIUM", "HIGH"].includes(priority as string)) {
+      throw new Error("Invalid priority value");
+    }
 
-    const buffer = Buffer.from(await data.file.arrayBuffer());
-    await fs.writeFile(filePath, buffer);
+    // --------------------------------------------------
+    // 2️⃣ Upload file to Supabase Storage
+    // --------------------------------------------------
+    const fileExt = file.name.split(".").pop();
+    const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
 
-    // Save relative path only
-    const resp = await prisma.crisis.create({
+    const storagePath = `crisis/${Date.now()}-${crypto.randomUUID()}-${safeFileName}`;
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from("crisis")
+      .upload(storagePath, buffer, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    // --------------------------------------------------
+    // 3️⃣ Get public URL
+    // --------------------------------------------------
+    const { data: publicUrlData } = supabaseAdmin.storage
+      .from("crisis")
+      .getPublicUrl(storagePath);
+
+    if (!publicUrlData?.publicUrl) {
+      throw new Error("Failed to generate public file URL");
+    }
+
+    // --------------------------------------------------
+    // 4️⃣ Save crisis record in DB
+    // --------------------------------------------------
+    const crisis = await prisma.crisis.create({
       data: {
-        title: data.title,
-        priority: data.priority,
-        file_path: `/uploads/crisis/${fileName}`,
-        created_by: data.created_by,
+        title,
+        priority: priority as "LOW" | "MEDIUM" | "HIGH",
+        file_path: publicUrlData.publicUrl,
+        created_by: Number(created_by),
       },
     });
 
+    // --------------------------------------------------
+    // 5️⃣ Return safe response
+    // --------------------------------------------------
     return {
       success: true,
-      message: "Created Successfully",
-      data: resp,
+      message: "Crisis created successfully",
+      data: {
+        id: crisis.id,
+        title: crisis.title,
+        priority: crisis.priority,
+        file_path: crisis.file_path,
+      },
     };
-  } catch (err: any) {
-    console.error("❌ Error creating crisis:", err.message);
+  } catch (error: any) {
+    console.error("❌ createCrisis failed:", error);
+
     return {
       success: false,
-      message: err.message,
+      message: error.message ?? "Failed to create crisis",
     };
   }
 };
@@ -96,27 +140,29 @@ export async function getCrisisById(id: number) {
 
   if (!crisis) return null;
 
-  // ✅ FIX: avoid path duplication
-  const filePath = path.join(process.cwd(), "public", crisis.file_path);
-
-  // ✅ SAFETY CHECK (prevents ENOENT)
-  try {
-    await fs.access(filePath);
-  } catch {
-    throw new Error(`File not found: ${filePath}`);
-  }
-
   let previewContent = "";
 
-  if (filePath.endsWith(".docx")) {
-    const result = await mammoth.convertToHtml({ path: filePath });
-    previewContent = result.value;
-  } else if (filePath.endsWith(".txt")) {
-    previewContent = await fs.readFile(filePath, "utf-8");
-  }
+  if (crisis.file_path?.toLowerCase().endsWith(".docx")) {
+    try {
+      const res = await fetch(crisis.file_path);
+      if (!res.ok) throw new Error("Fetch failed");
+      const arrayBuffer = await res.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
 
+      const result = await mammoth.convertToHtml({ buffer });
+      previewContent = result.value;
+    } catch (err) {
+      console.error("⚠️ DOCX preview failed:", err);
+      previewContent = "";
+    }
+  }
   return {
-    ...crisis,
+    id: crisis.id,
+    title: crisis.title,
+    file_path: crisis.file_path,
+    priority: crisis.priority,
+    created_at: crisis.created_at,
+    author: crisis.author ?? null,
     previewContent,
   };
 }

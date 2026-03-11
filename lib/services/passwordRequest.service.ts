@@ -73,6 +73,8 @@ export const adminResetsUserPassword = async (
       where: { user_id: userId },
       data: {
         password_hash: hashedPwd,
+        must_change_password: true,
+        temp_password_expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
       },
     });
   } catch (error) {
