@@ -137,6 +137,12 @@ export default function LoginPage() {
             {isLoading ? "Logging in..." : "Sign In"}
           </button>
 
+          {error && (
+            <p className="text-sm text-red-600 text-center font-medium">
+              {error}
+            </p>
+          )}
+
           {/* Forgot Password */}
           <div className="text-center">
             <button
