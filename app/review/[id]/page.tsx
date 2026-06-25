@@ -46,24 +46,24 @@ const ReviewPage = () => {
 
   console.log("Document:", data);
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      const payload: any = {
-        title: data.title,
-        type: data.type,
-        file_path: data.file_path,
-        ministry_id: data.ministry_id,
-        status: status,
-        feedbacks: [...data.feedbacks],
-      };
-      await updateDocument(Number(id), payload);
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      console.error("Error submitting review:", error);
-    }
-  };
+  // const handleSubmit = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const payload: any = {
+  //       title: data.title,
+  //       type: data.type,
+  //       file_path: data.file_path,
+  //       ministry_id: data.ministry_id,
+  //       status: status,
+  //       feedbacks: [...data.feedbacks],
+  //     };
+  //     await updateDocument(Number(id), payload);
+  //     setLoading(false);
+  //   } catch (error) {
+  //     setLoading(false);
+  //     console.error("Error submitting review:", error);
+  //   }
+  // };
 
   return (
     <>
@@ -141,13 +141,13 @@ const ReviewPage = () => {
                 placeholder="Add feedback..."
               />
 
-              <button
+              {/* <button
                 onClick={handleSubmit}
                 disabled={loading}
                 className="px-4 py-2 bg-[#004225] text-white rounded hover:bg-[#003218]"
               >
                 {loading ? "Submitting..." : "Submit Review"}
-              </button>
+              </button> */}
             </div>
             {data.feedbacks?.length > 0 && (
               <div className="mt-6">

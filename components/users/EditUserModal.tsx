@@ -100,11 +100,7 @@ export function EditUserModal({
               placeholder="Enter a new password here"
               onChange={(e) => setNewPassword(e.target.value)}
             />
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={generateTempPassword}>
-                Generate
-              </Button>
-            </div>
+            
           </div>
           <div className="grid gap-3">
             <Label htmlFor="expires">Expires (hours)</Label>
