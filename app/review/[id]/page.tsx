@@ -1,8 +1,9 @@
 "use client";
 import { useParams } from "next/navigation";
 import {
+  changeDocumentStatus,
+  createFeedback,
   getDocumentById,
-  updateDocument,
 } from "@/lib/services/documentService";
 import { useEffect, useRef, useState } from "react";
 import Navbar from "@/components/shared/Navbar";
@@ -16,6 +17,7 @@ const ReviewPage = () => {
   );
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
 
   const { user }: any = useAuth();
   const [editedContent, setEditedContent] = useState<string>("");
@@ -46,24 +48,35 @@ const ReviewPage = () => {
 
   console.log("Document:", data);
 
-  // const handleSubmit = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const payload: any = {
-  //       title: data.title,
-  //       type: data.type,
-  //       file_path: data.file_path,
-  //       ministry_id: data.ministry_id,
-  //       status: status,
-  //       feedbacks: [...data.feedbacks],
-  //     };
-  //     await updateDocument(Number(id), payload);
-  //     setLoading(false);
-  //   } catch (error) {
-  //     setLoading(false);
-  //     console.error("Error submitting review:", error);
-  //   }
-  // };
+  const documentId = Number(Array.isArray(id) ? id[0] : id);
+
+  const handleSubmit = async () => {
+    if (!user?.user_id) {
+      setSubmitMessage("You must be signed in to submit a review.");
+      return;
+    }
+
+    const trimmedFeedback = feedback.trim();
+    if (!trimmedFeedback) {
+      setSubmitMessage("Please add feedback before submitting the review.");
+      return;
+    }
+
+    setLoading(true);
+    setSubmitMessage(null);
+
+    try {
+      await createFeedback(documentId, user.user_id, trimmedFeedback);
+      await changeDocumentStatus(documentId, status, user.user_id);
+      setSubmitMessage("Review submitted successfully.");
+      setFeedback("");
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      setSubmitMessage("Failed to submit review. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -141,13 +154,16 @@ const ReviewPage = () => {
                 placeholder="Add feedback..."
               />
 
-              {/* <button
+              <button
                 onClick={handleSubmit}
-                disabled={loading}
-                className="px-4 py-2 bg-[#004225] text-white rounded hover:bg-[#003218]"
+                disabled={loading || !feedback.trim()}
+                className="px-4 py-2 bg-[#004225] text-white rounded hover:bg-[#003218] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Submitting..." : "Submit Review"}
-              </button> */}
+              </button>
+              {submitMessage && (
+                <p className="text-sm text-[#004225]">{submitMessage}</p>
+              )}
             </div>
             {data.feedbacks?.length > 0 && (
               <div className="mt-6">

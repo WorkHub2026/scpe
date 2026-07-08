@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from "react";
 import DecisionModal from "@/components/DecisionModal";
-import { AlertCircle, CheckCircle, Clock, Search, Calendar } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Search,
+  Calendar,
+} from "lucide-react";
 import {
   changeDocumentStatus,
   createFeedback,
@@ -11,7 +17,11 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
-export default function SubmissionList({ documents: initialDocuments }: { documents: any[] }) {
+export default function SubmissionList({
+  documents: initialDocuments,
+}: {
+  documents: any[];
+}) {
   const [documents, setDocuments] = useState(initialDocuments);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchDate, setSearchDate] = useState("");
@@ -216,7 +226,10 @@ export default function SubmissionList({ documents: initialDocuments }: { docume
                 </span>
                 {doc.status === "Submitted" && (
                   <button
-                    onClick={() => setShowModal(doc.document_id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowModal(doc.document_id);
+                    }}
                     className="text-xs px-3 py-2 bg-[#004225]/20 hover:bg-[#004225]/30 text-[#004225] rounded-lg font-bold transition-colors duration-300 whitespace-nowrap"
                   >
                     Make Decision
